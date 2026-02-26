@@ -47,43 +47,6 @@ and the premature abstraction becomes a coupling point.
 Don't abstract on the second occurrence. Abstract on the third. By then you have enough
 examples to know what the *actual* common pattern is, rather than guessing from two data points.
 
-## Fail Fast
-
-Throw errors when preconditions aren't met — don't silently continue with bad state. A loud
-failure at the point of origin is infinitely easier to debug than a quiet corruption that
-surfaces three layers later.
-
-- Validate inputs at function boundaries, not deep inside implementation
-- Use assertions for invariants that should never be violated
-- Prefer explicit exceptions over returning sentinel values (`None`, `-1`, empty DataFrame)
-- Let errors propagate to the appropriate handler — don't catch and swallow
-
-```python
-# Good: fail immediately with a clear message
-def compute_spread(price: float, par: float) -> float:
-    if price <= 0:
-        raise ValueError(f"Price must be positive, got {price}")
-    ...
-
-# Bad: silently returns garbage
-def compute_spread(price: float, par: float) -> float:
-    if price <= 0:
-        return 0.0  # caller has no idea this is invalid
-    ...
-```
-
-## Fix Root Causes
-
-Address the underlying issue, not the symptom. If a function produces wrong output for
-certain inputs, the fix is in the function's logic — not a filter on its output. If a module
-is hard to test, the problem is the module's dependencies — not a more elaborate test harness.
-
-Signs you're treating a symptom:
-- Adding a special case (`if x == weird_value: ...`) instead of fixing why `x` is weird
-- Wrapping a function in try/except to hide its failures
-- Adding a "cleanup" step after a process that shouldn't produce mess in the first place
-- Patching output instead of correcting the transformation
-
 ## Extensibility Checklist
 
 Before considering any piece of work "done", verify:
