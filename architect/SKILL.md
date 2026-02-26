@@ -147,6 +147,17 @@ is in the wrong place. Trace at least two levels: "If I separate X from Y, then 
 requires... and then changing W requires..." Stop when the consequences are speculative rather
 than probable.
 
+**Heuristic 7: Consistency boundaries**
+If changing object A requires object B to be updated immediately to keep the system valid,
+they belong in the same module. If B can be stale temporarily (eventual consistency), they
+belong in separate modules. This is the sharpest boundary test: ask "if I update X, what
+else MUST be true right now?" Everything in that answer lives together; everything outside
+it is a separate concern with its own update cadence.
+
+Example: if updating a bond's spread must immediately recalculate position risk → same
+module. If portfolio-level analytics can lag by one tick → separate module, separate
+update cycle.
+
 ### 2.2 Resolve Boundary Conflicts
 
 The heuristics will sometimes disagree. Resolution principles:
