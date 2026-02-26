@@ -1,0 +1,15 @@
+cd ~/research_projects/orch  # or whichever repo
+
+# Step 1: Architecture review — get the scorecard
+claude "review the architecture of this project"
+
+# Step 2: Code review — focus on conciseness
+claude "review the code in src/ — focus on reducing code volume, 
+       eliminating redundancy, and making it more succinct"
+
+# Step 3: Plan
+claude "create a refactoring plan from both reviews. 
+       prioritise changes that reduce code volume and simplify"
+
+# Step 4: Execute
+claude "execute Phase 1 of the refactoring plan"
