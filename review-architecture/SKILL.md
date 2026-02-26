@@ -286,6 +286,39 @@ Generate the report as a Markdown file at `/mnt/user-data/outputs/architecture-r
 Suggest a trigger, not a calendar interval.]
 ```
 
+## Quick Constraint Checks
+
+Before the full dimensional review, run these fast binary checks against the codebase.
+Each is a yes/no question — any "yes" is an immediate finding.
+
+**Dependency direction violations:**
+- Does any module in `core/` or `strategy/` import from `data/` or `execution/`?
+- Does domain logic reference specific infrastructure (file paths, API endpoints, database
+  connections, ORM classes)?
+- Are there `import sqlalchemy`, `import requests`, or similar infrastructure imports inside
+  business logic modules?
+
+**Encapsulation violations:**
+- Are mutable internal collections exposed directly (e.g., returning a list that callers
+  can `.append()` to)?
+- Can external code construct domain objects in invalid states (missing required fields,
+  violating invariants)?
+
+**Testing red flags:**
+- Do unit tests require a database, network, or filesystem to run?
+- Are tests slow (>5s for the unit suite)? This usually means infrastructure is leaking
+  into logic.
+- Is there no way to swap a real dependency for a fake/mock without modifying the module
+  under test?
+
+**Coupling red flags:**
+- Does adding a new strategy/signal/data source require modifying more than 2 existing files?
+- Are there `isinstance` or `type ==` checks that would need updating for each new variant?
+- Do multiple modules hardcode the same magic numbers, column names, or config values?
+
+These checks run in minutes and often catch the highest-severity findings before the full
+review even starts. Report any failures as findings with their dimension and severity.
+
 ## Critical Rules
 
 - **Read-only.** Do not modify, create, or delete any source files. This is a diagnostic.
