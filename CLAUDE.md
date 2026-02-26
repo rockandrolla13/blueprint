@@ -44,6 +44,7 @@ blueprint/
 ├── refactor/SKILL.md              # Restructure existing code without changing behaviour
 ├── review-architecture/SKILL.md   # System-level structural diagnostic (scored, read-only)
 ├── refactoring-plan/SKILL.md      # Prioritised roadmap from review findings to execution
+├── plan-tracker/SKILL.md          # Creates, updates, and verifies tracked execution plans
 └── code-review/SKILL.md           # File-level Clean Code review (external, may not be present)
 ```
 

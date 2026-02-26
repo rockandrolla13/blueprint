@@ -108,6 +108,15 @@ adjust the scope or priorities?"*
 
 ## Phase 4: Execute
 
+### 4.0 Plan Tracking
+If a `PLAN-*.md` file exists in the working directory, update it as you execute:
+- Before starting each step: set status to `IN PROGRESS`
+- After completing each step: set status to `DONE`, add brief note
+- On failure: set status to `FAILED`, **stop and ask**: retry, skip, or abort?
+- Append each action to the plan's Execution Log with timestamp
+
+If no plan file exists, execute normally without tracking.
+
 ### 4.1 One Step at a Time
 Execute each refactoring step in order:
 1. Make the structural change

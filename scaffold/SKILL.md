@@ -273,6 +273,15 @@ def parallel_map(
 Include this in `core/concurrency.py` when the project template is generated. Individual
 modules then import and use it rather than each writing their own parallel execution logic.
 
+## Plan Tracking
+
+If a `PLAN-*.md` file exists in the working directory, update it as you scaffold:
+- Set each scaffolding step to `IN PROGRESS` before starting, `DONE` after completion
+- On failure (e.g., can't create file, naming conflict): set `FAILED`, stop and ask
+- Append each created file to the plan's Execution Log
+
+If no plan file exists, scaffold normally without tracking.
+
 ## Consistency Rules
 
 1. **Match existing conventions.** If the project uses `dataclasses`, scaffold with `dataclasses`.

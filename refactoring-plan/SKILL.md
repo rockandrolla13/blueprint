@@ -232,17 +232,27 @@ that the refactoring aims to improve]
 [Findings that were deprioritised and why. Keeps scope honest.]
 ```
 
-## Handoff to Refactor Skill
+## Handoff: Create Tracked Plan
 
-The roadmap is the input to the refactor skill. State this explicitly:
+After the roadmap is approved, create a `PLAN-<task-name>.md` file in the target directory
+using the plan-tracker skill format:
 
-*"Refactoring roadmap complete. To execute, work through the phases in order — each step
-is designed to leave the system working. Want me to start executing Phase 1?"*
+1. Convert the roadmap phases and steps into the plan-tracker table format (step number,
+   description, Status = `PENDING`, empty Notes)
+2. Capture the pre-execution snapshot (file count, line count, test status, architecture
+   scores if available)
+3. Derive verification criteria from the "Expected Outcome" scorecard
+4. Write the plan file
+
+Then state:
+
+*"Tracked plan created at `PLAN-<name>.md`. To execute, work through the phases in order —
+each step is designed to leave the system working. Want me to start executing Phase 1?"*
 
 When the refactor skill picks up:
-- It follows the step order from the roadmap
-- It uses the "What changes" and "Verification" sections as its work specification
-- After each phase, the user can re-run review-architecture to measure improvement
+- It follows the step order from the plan file
+- It updates the plan file status as each step completes or fails
+- After all phases, run plan-tracker verification to produce the completion report
 
 ## Critical Rules
 

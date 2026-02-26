@@ -39,7 +39,7 @@
 
 **When:** Starting a project from scratch. No existing code.
 
-**Skill chain:** `ideate → architect → design → scaffold`
+**Skill chain:** `ideate → architect → design → plan-tracker → scaffold → plan-tracker (verify)`
 
 ```bash
 mkdir ~/Gitrepos/new-project && cd ~/Gitrepos/new-project
@@ -63,10 +63,17 @@ claude "design the architecture — dependency graph, interfaces,
 # → Dependency graph, protocols, file tree, error handling strategy
 # → CHECKPOINT: you approve the design
 
-# Step 4: Generate boilerplate
-claude "scaffold the project"
+# Step 4: Create plan and scaffold
+claude "create a tracked plan and scaffold the project"
+# → PLAN-*.md created with scaffolding steps + pre-execution snapshot
 # → Project files created following your conventions
+# → Plan updated as each file is created
 # → You fill in the domain logic
+
+# Step 5: Verify
+claude "verify the plan"
+# → Confirms all scaffolding steps completed
+# → Lists files created, test fixtures in place
 ```
 
 **Exit state:** Scaffolded project with protocols, config, CLI entry point, test fixtures, and TODO markers where domain logic goes.
@@ -79,7 +86,7 @@ claude "scaffold the project"
 
 **Indicators:** Architecture review scorecard mostly 🟢/🟡 with a few 🟠. You're not questioning *what* the pieces are, just *how* they're arranged.
 
-**Skill chain:** `review-architecture → code-review → refactoring-plan → refactor → review-architecture`
+**Skill chain:** `review-architecture → code-review → refactoring-plan → plan-tracker → refactor → plan-tracker (verify)`
 
 ```bash
 cd ~/Gitrepos/existing-project
@@ -97,18 +104,23 @@ claude "review the code in src/"
 # Step 3: Prioritise and plan
 claude "create a refactoring plan from the review findings"
 # → Consolidated findings, dependency DAG, Pareto analysis
-# → Phased roadmap, each phase leaves system working
-# → refactoring-plan.md produced
+# → Phased roadmap produced
+# → PLAN-*.md created with all steps PENDING + pre-execution snapshot
 # → CHECKPOINT: you approve the plan
 
 # Step 4: Execute phase by phase
 claude "execute Phase 1 of the refactoring plan"
 # → Changes made, tests pass after each step
+# → PLAN-*.md updated: steps move PENDING → DONE/FAILED
+# → On failure: Claude stops and asks retry/skip/abort
 # → Repeat for each phase
 
-# Step 5: Verify improvement
-claude "review the architecture again — compare to the previous review"
-# → New scorecard, before/after comparison
+# Step 5: Verify
+claude "verify the plan"
+# → Completion check (all steps DONE or SKIPPED?)
+# → Diff summary (files, lines, tests before vs after)
+# → Architecture re-review with before/after scorecard
+# → Verdict appended to PLAN-*.md
 ```
 
 **Rules:**
@@ -127,7 +139,7 @@ claude "review the architecture again — compare to the previous review"
 
 **Indicators:** Architecture review scorecard has 🟠 or 🔴 on Boundary Quality, Dependency Direction, or Extensibility. Adding a new capability requires touching 5+ files (shotgun surgery). The pain is structural, not cosmetic.
 
-**Skill chain:** `review-architecture → architect → design → refactoring-plan → refactor → review-architecture`
+**Skill chain:** `review-architecture → architect → design → refactoring-plan → plan-tracker → refactor → plan-tracker (verify)`
 
 ```bash
 cd ~/Gitrepos/existing-project
@@ -156,20 +168,21 @@ claude "create a refactoring plan to migrate from the current
        architecture to the new design"
 # → Ordered steps from current state to target state
 # → Each step leaves the system working — no big bang
-# → Migration may involve: splitting modules, merging modules,
-#   introducing new abstractions, moving code between files,
-#   retiring old interfaces
-# → refactoring-plan.md produced
+# → PLAN-*.md created with all steps PENDING + pre-execution snapshot
 # → CHECKPOINT: you approve the migration plan
 
 # Step 5: Execute phase by phase
 claude "execute Phase 1 of the migration plan"
 # → Incremental structural changes, tests pass at each step
+# → PLAN-*.md updated as steps complete
+# → On failure: Claude stops and asks retry/skip/abort
 # → Repeat for each phase
 
-# Step 6: Verify the new architecture
-claude "review the architecture — compare to the original review"
-# → New scorecard, confirm structural improvement
+# Step 6: Verify
+claude "verify the plan"
+# → Completion check, diff summary, architecture re-review
+# → Before/after scorecard confirms structural improvement
+# → Verdict appended to PLAN-*.md
 ```
 
 **Rules:**
@@ -192,7 +205,7 @@ claude "review the architecture — compare to the original review"
 
 **When:** Adding a new capability (new strategy, new data source, new CLI command, new pipeline stage) to an existing system.
 
-**Skill chain:** `review-architecture (optional) → architect → design → scaffold`
+**Skill chain:** `review-architecture (optional) → architect → design → plan-tracker → scaffold → plan-tracker (verify)`
 
 ```bash
 cd ~/Gitrepos/existing-project
@@ -219,11 +232,16 @@ claude "design the integration — interfaces, data flow, how it
 # → New/modified protocols, config changes, test strategy
 # → CHECKPOINT: you approve the design
 
-# Step 3: Generate the new module
-claude "scaffold the new [strategy/pipeline/module]"
+# Step 3: Create plan and scaffold
+claude "create a tracked plan and scaffold the new [strategy/pipeline/module]"
+# → PLAN-*.md created with scaffolding + integration steps
 # → Files created following existing project conventions
 # → Wired into existing CLI, config, and test structure
 # → TODO markers where domain logic goes
+
+# Step 4: Verify
+claude "verify the plan"
+# → Confirms all steps completed, files created, integration wired
 ```
 
 **Rules:**
