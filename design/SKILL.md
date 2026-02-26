@@ -81,7 +81,15 @@ Explicitly identify:
   where bugs live. Prefer immutable shared state; if mutable, specify the synchronisation
   mechanism.
 
-### 2.4 Anti-Pattern Scan
+### 2.4 Inversion Check
+
+Before checking for specific anti-patterns, invert the problem: instead of asking "is this
+design good?", ask "what would make this design fail?" Common answers: a dependency cycle
+nobody noticed, a shared mutable state that breaks under concurrency, an abstraction that
+doesn't survive the next requirement change. If any of these map to the current design,
+fix them now — they're cheaper to fix in the design than in the code.
+
+### 2.5 Anti-Pattern Scan
 Check for these — they're the ones that bite hardest when extending later:
 
 | Anti-Pattern | Detection Signal | Resolution |

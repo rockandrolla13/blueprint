@@ -28,6 +28,11 @@ Before starting, read the shared engineering principles:
 
 ### Step 1: Ingest the Codebase
 
+**The map is not the territory.** Your mental model of the codebase is not the codebase.
+Read the actual code — trace imports, check what functions actually do, verify assumptions
+against reality. Do not review your idea of the architecture; review the architecture as it
+exists in the files.
+
 Read the project structure and understand what exists:
 
 1. **Directory tree** — list the full file/directory layout

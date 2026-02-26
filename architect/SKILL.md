@@ -140,6 +140,13 @@ different pipeline, different project), it should be its own module. The `parall
 is an example — it's domain-agnostic and reusable, so it lives in `core/concurrency.py`, not
 inside any specific strategy.
 
+**Heuristic 6: Second-order consequences ("and then what?")**
+For each candidate boundary, ask: if I draw the line here, what future decisions does this
+constrain? A boundary that solves today's decomposition but makes tomorrow's extension painful
+is in the wrong place. Trace at least two levels: "If I separate X from Y, then adding Z
+requires... and then changing W requires..." Stop when the consequences are speculative rather
+than probable.
+
 ### 2.2 Resolve Boundary Conflicts
 
 The heuristics will sometimes disagree. Resolution principles:

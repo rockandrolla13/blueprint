@@ -114,7 +114,15 @@ changes — the quick wins that build momentum and reduce compounding debt.
 Reorder by priority score BUT respect the dependency DAG. If F4 depends on F1, F1 comes
 first even if F4 has a higher priority score.
 
-### 3.3 Group into Phases
+### 3.3 Apply the Pareto Lens
+
+After scoring, ask: which 20% of these fixes yields 80% of the structural improvement?
+Often 2–3 findings are load-bearing — fixing them cascades improvements through the codebase
+(e.g., inverting a dependency direction unlocks testability, which unlocks parallelisation).
+The rest are polish. Identify and label the load-bearing fixes explicitly so the user can
+see where the leverage is.
+
+### 3.4 Group into Phases
 
 Organise the ordered findings into execution phases. Each phase:
 - Contains 2–4 related refactoring steps

@@ -24,10 +24,13 @@ Before starting, read the shared engineering principles:
 
 ## Mode Detection
 
-The user will arrive in one of two modes. Detect which and adjust:
+The user will arrive in one of two modes. These correspond to fundamentally different
+cognitive tasks — **divergent** thinking (generating options) and **convergent** thinking
+(narrowing to a decision). Detect which mode the user is in and adjust. Mode A is divergent;
+Mode B is convergent. The checkpoint at the end is always convergence.
 
 ### Mode A: Open Exploration ("I have a vague idea...")
-When the user hasn't committed to an approach:
+When the user hasn't committed to an approach — this is divergent thinking:
 
 1. **Frame the problem** — restate it precisely. Separate the goal (what must be true when done)
    from the approach (how to get there). Often the user conflates these.
@@ -54,12 +57,19 @@ This is the primary mode. When the user has a plan:
    - Scale assumptions (will this work at 10x volume?)
    - Coupling assumptions (does this assume component X won't change?)
    - Environment assumptions (deployment, concurrency, infrastructure)
-3. **Failure mode analysis** — for each load-bearing assumption, describe what happens when it
+3. **Inversion** — instead of asking "how do we make this work?", ask "how could this
+   fail?" and "what would guarantee this project is a disaster?" Working backward from
+   failure often reveals risks that forward reasoning misses. For each failure mode
+   identified, check whether the proposed design has a defence or is exposed.
+4. **Failure mode analysis** — for each load-bearing assumption, describe what happens when it
    breaks and what the recovery path looks like. This is where most plans have blind spots.
-4. **Extensibility probe** — ask: "Six months from now, what's the most likely way this system
+5. **Second-order consequences** — for each major design decision, ask "and then what?"
+   What future decisions does this choice constrain or enable? A design that solves today's
+   problem but forecloses tomorrow's options is a trap.
+6. **Extensibility probe** — ask: "Six months from now, what's the most likely way this system
    needs to change?" Then check whether the proposed design accommodates that change gracefully
    or requires significant rework.
-5. **DRY/Coupling check** — identify any points where the proposed design creates implicit
+7. **DRY/Coupling check** — identify any points where the proposed design creates implicit
    coupling between components that should be independent, or duplicates knowledge that should
    be centralised.
 
