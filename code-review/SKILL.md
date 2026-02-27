@@ -7,6 +7,9 @@ description: "Use when reviewing Python code for correctness, conciseness, and a
 
 FEEDBACK ONLY. Reviews Python code and produces a severity-ranked Markdown report. Never modifies, creates, or overwrites source files. The only file this skill creates is the review report.
 
+Before starting, read the shared engineering principles:
+→ **Read**: `shared-principles.md` (sibling to this skill directory)
+
 ## Philosophy
 
 Two non-negotiable priorities, in order:

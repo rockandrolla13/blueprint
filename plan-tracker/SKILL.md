@@ -90,6 +90,18 @@ Triggered at the start of any multi-step workflow. Takes input from upstream ski
 - Capture the pre-execution snapshot immediately — file count, line count, test status
 - If an architecture review was run, record the scorecard scores
 
+**CHECKPOINT — STOP after creating the plan.**
+
+Present a summary:
+- Objective (1 sentence)
+- Number of phases and total steps
+- Pre-execution snapshot (files, lines, test status)
+- First phase name and step count
+
+Then ask: *"Plan created at `PLAN-<name>.md`. Ready to begin execution?"*
+
+Do NOT proceed to execution until the user confirms.
+
 ### Mode 2: Update Plan
 
 Triggered during execution. Other skills (refactor, scaffold, etc.) call into this mode
