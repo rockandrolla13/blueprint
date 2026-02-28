@@ -227,7 +227,9 @@ Score contribution: 🟡 (not a problem, but a missed opportunity)
 
 ## Step 3: Produce the Report
 
-Generate the report as a Markdown file at `/mnt/user-data/outputs/architecture-review.md`.
+Generate the report as a Markdown file at `reviews/YYYY_mm_dd_architecture_review.md`
+(relative to repository root). Follow the versioning convention: use Glob to check for
+existing files with the same date and scope; if matches exist, increment the version suffix.
 
 ### Report Template
 

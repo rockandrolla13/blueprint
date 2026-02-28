@@ -21,7 +21,7 @@ should only need to fill in the domain-specific logic, not reinvent the structur
 
 Before starting, read the shared engineering principles:
 → **Read**: `shared-principles.md` (sibling to this skill directory)
-→ **Read**: `templates/` directory in this skill folder for available templates
+→ Templates are defined inline below. Extract to `templates/` when patterns stabilise.
 
 ## How Scaffolding Works
 

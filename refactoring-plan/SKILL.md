@@ -101,12 +101,12 @@ For each consolidated finding, score on three axes:
 | Axis | Question | Scale |
 |---|---|---|
 | **Impact** | How much does this impede current development or future extensibility? | 1 (cosmetic) → 5 (blocking) |
-| **Effort** | How much work to fix, including tests? | 1 (< 1 hour) → 5 (> 1 day) |
+| **Scope** | How many modules/boundaries does the fix cross? | 1 (single function) → 5 (cross-cutting) |
 | **Risk** | How likely is this change to break something? | 1 (safe) → 5 (dangerous) |
 
-Compute a **priority score**: `Impact × 2 - Effort - Risk`
+Compute a **priority score**: `Impact × 2 - Scope - Risk`
 
-Higher score = do first. This formula biases toward high-impact, low-effort, low-risk
+Higher score = do first. This formula biases toward high-impact, narrow-scope, low-risk
 changes — the quick wins that build momentum and reduce compounding debt.
 
 ### 3.2 Apply Dependency Constraints
@@ -128,7 +128,7 @@ Organise the ordered findings into execution phases. Each phase:
 - Contains 2–4 related refactoring steps
 - Has a clear "definition of done" (what's true when the phase is complete)
 - Leaves the system in a fully working, deployable state
-- Can be completed in a single focused session (roughly 2–4 hours)
+- Can be completed in a single focused session
 
 ## Phase 4: Size and Plan Each Step
 
@@ -140,8 +140,8 @@ For each refactoring step, specify:
 ### Step [N]: [Title]
 
 **Finding:** [F-ID and one-line description]
-**Priority score:** [Impact × 2 - Effort - Risk = X]
-**Estimated effort:** [time range, e.g., 30–60 min]
+**Priority score:** [Impact × 2 - Scope - Risk = X]
+**Scope:** [single-function / single-module / multi-module / cross-cutting]
 **Risk level:** [Low / Medium / High]
 
 **What changes:**
@@ -166,7 +166,9 @@ For each refactoring step, specify:
 
 ## Phase 5: Produce the Roadmap
 
-Generate the roadmap as a Markdown file at `/mnt/user-data/outputs/refactoring-plan.md`.
+Generate the roadmap as a Markdown file at `reviews/YYYY_mm_dd_refactoring_plan.md`
+(relative to repository root). Follow the versioning convention: use Glob to check for
+existing files with the same date and scope; if matches exist, increment the version suffix.
 
 ### Roadmap Template
 
@@ -176,7 +178,6 @@ Generate the roadmap as a Markdown file at `/mnt/user-data/outputs/refactoring-p
 **Project:** [name]
 **Date:** [date]
 **Findings consolidated:** [count]
-**Estimated total effort:** [range]
 
 ## Executive Summary
 
@@ -260,8 +261,8 @@ When the refactor skill picks up:
   refactor skill handles execution.
 - **Every step is safe.** The system must work after every individual step. If a step
   requires a temporary broken state, combine it with the next step into an atomic unit.
-- **Effort estimates are ranges, not points.** Always give a range (e.g., 30–60 min, not
-  "45 min"). Acknowledge uncertainty.
+- **Scope, not time.** Describe complexity (single-function, single-module, cross-cutting),
+  not duration. Time estimates create false precision.
 - **Deprioritisation is explicit.** If findings are deferred, say why. "Not addressed in
   this plan because [low impact / high risk / requires broader discussion]."
 - **The plan is a suggestion, not a mandate.** Present it, get feedback, adjust. The user

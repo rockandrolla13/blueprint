@@ -92,3 +92,75 @@ Quick decision:
 | Adding a new capability | W4 Extend | `claude "architect where [X] fits..."` |
 | Vague problem, need to think | W5 Explore | `claude "ideate..."` |
 | Beyond saving (rare) | W6 Rewrite | Review old → W1 on new |
+
+## Example Prompts
+
+### ideate
+
+**Open exploration:**
+```
+I need to build a system that monitors credit spreads across 500 bonds and
+generates carry signals daily. What are my options?
+```
+
+**Stress-test:**
+```
+Here's my plan: I'll compute carry as the rolling z-spread minus the
+sector median, rank by decile, and rebalance weekly. Poke holes in this.
+```
+
+### architect
+```
+I've decided to build the carry signal system. Help me figure out what the
+components should be — what are the right abstractions?
+```
+
+### design
+```
+Architecture is approved. Design the carry signal system — dependency graph,
+interfaces, file structure.
+```
+
+### scaffold
+
+**New project:**
+```
+Scaffold a new project called "carry-monitor" for the carry signal system.
+```
+
+**New module in existing project:**
+```
+Add a new momentum signal like the existing carry signal.
+```
+
+### refactor
+```
+This pipeline.py works but it's a single 400-line function. Clean it up.
+```
+
+### review-architecture
+```
+Review the architecture of this project. Is the structure sound?
+```
+
+### refactoring-plan
+```
+I just got the architecture review and code review results. What should I
+fix first?
+```
+
+### code-review
+```
+Review this code.
+```
+
+## Tips
+
+- **Skills chain naturally.** Output of one skill is input to the next.
+  Say "proceed" or name the next step — no manual context passing needed.
+- **Every skill stops for approval.** Design, refactoring plans, and scaffold
+  all present their output for review before writing code.
+- **Quantitative problems get extra scrutiny.** ideate and design add
+  mathematical specification, degeneracy analysis, and overfitting checks.
+- **Parallelisation is always considered.** Every skill flags embarrassingly
+  parallel components and sequential bottlenecks.
