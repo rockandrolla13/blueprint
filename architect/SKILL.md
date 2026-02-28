@@ -34,6 +34,8 @@ This is not a mechanical process. It requires understanding both the domain (wha
 exist, how they relate, how they change) and software (what abstractions are available, what
 each costs, how they compose). Your value is bridging these two worlds.
 
+**Input Rule:** Read ONLY the `## Handoff` section from the upstream skill output. Ignore all content outside the Handoff for structural decisions. Content outside the Handoff is for human context only.
+
 ## Phase 1: Domain Mapping
 
 ### 1.1 Extract Domain Concepts
@@ -307,3 +309,51 @@ Watch for these — they're the most common decomposition mistakes:
 | **God module** | One module that imports from everything and everything imports from | Decompose by identifying the 2–3 distinct responsibilities hiding inside it |
 | **Circular knowledge** | Module A needs to know about B's internals to function, and vice versa | Extract the shared concept into a third module that both depend on |
 | **Util/Common/Helpers** | A grab-bag module where "everything else" goes | Each function in utils has a natural home in a domain module — relocate them |
+
+## Contract (BCS-1.0)
+
+### Mode
+READ-ONLY
+
+### Consumes
+Accepts input from THREE possible entry points (exactly one per invocation):
+
+1. **From ideate (W1 Build, W5 Explore):**
+   - MUST: `## Handoff` from ideate containing `Chosen approach:` and `Load-bearing assumptions:`
+
+2. **From review-architecture (W3 Redesign):**
+   - MUST: `## Handoff` from review-architecture containing Scorecard and findings
+   - Architect uses the findings to inform decomposition decisions
+
+3. **Direct entry (W4 Extend):**
+   - No upstream Handoff required
+   - User provides the existing codebase context directly
+   - review-architecture Handoff is OPTIONAL additional input
+
+If entry point is ideate and Handoff is missing: STOP. Output: "CONTRACT VIOLATION: ideate Handoff missing [list fields]. Provide: Chosen approach: <one sentence>, Load-bearing assumptions: <bullet list>"
+
+### Produces
+MUST emit a `## Handoff` section at the end of the output containing:
+- Domain model as a Mermaid diagram (in a ```mermaid fence)
+- Module decomposition table with columns: Module | Responsibility | Knows About | Doesn't Know About | Changes When
+- Abstraction decisions using ONLY: Module / Package / Class / Protocol / Function / Dataclass / Config
+- Rate-of-change map with categories: Stable / Moderate / Volatile
+- `DAG check: PASS` or `DAG check: FAIL` (if FAIL, design must halt)
+- `Entry point:` — one of: ideate | review-architecture | direct
+OPTIONAL inside Handoff:
+- Cross-cutting concerns (Errors, Logging, Config, Performance)
+FORBIDDEN inside Handoff:
+- Boundary conflict resolution rationale
+- New modules not in the module table
+
+### Degrees of Freedom
+- `## Handoff` header must be literal
+- Module table column names must be literal
+- Abstraction labels must use the vocabulary above exactly
+- Rate-of-change category names must be literal
+- Mermaid diagram format required (not ASCII art)
+- `Entry point:` label must be literal
+
+### Downstream Consumers
+- design (reads Handoff only)
+- plan-tracker (reads Handoff for build tracking in W1/W4)

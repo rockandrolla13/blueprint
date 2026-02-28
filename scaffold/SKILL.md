@@ -23,6 +23,8 @@ Before starting, read the shared engineering principles:
 → **Read**: `shared-principles.md` (sibling to this skill directory)
 → Templates are defined inline below. Extract to `templates/` when patterns stabilise.
 
+**Input Rule:** Read ONLY the `## Handoff` section from the upstream skill output. Ignore all content outside the Handoff for structural decisions. Content outside the Handoff is for human context only.
+
 ## How Scaffolding Works
 
 ### Step 1: Identify the Pattern
@@ -294,3 +296,33 @@ If no plan file exists, scaffold normally without tracking.
    strategy modules, the docstring includes the mathematical specification stub.
 5. **Mark TODOs.** Use `# TODO:` comments for logic the user needs to fill in. Be specific:
    `# TODO: implement signal computation` not just `# TODO`.
+
+## Contract (BCS-1.0)
+
+### Mode
+WRITES CODE (after design gate approval)
+
+### Consumes
+- MUST: `## Handoff` from design containing file structure, protocol definitions, config design
+- If missing: STOP with CONTRACT VIOLATION.
+- Copies file structure, protocols, and config verbatim from the Handoff.
+
+Operates in two modes:
+1. **Greenfield (W1 Build):** Creates all files from scratch
+2. **Extend (W4 Extend):** Adds new files into an existing codebase — MUST NOT overwrite existing files unless the design Handoff explicitly marks them for modification
+
+### Produces
+- Generated/added project files matching the design Handoff
+- Every non-trivial function body contains a TODO comment
+- Smoke test file(s) that import all new modules without error
+- In Extend mode: integration test verifying new modules work with existing code
+- No ## Handoff section (terminal skill)
+
+### Degrees of Freedom
+- File contents beyond protocols/config are scaffold's to determine
+- TODO format is free
+- Test structure is free
+- In Extend mode, may create adapter files to bridge new and existing code
+
+### Downstream Consumers
+- plan-tracker (updates PLAN status to DONE after scaffold completes)

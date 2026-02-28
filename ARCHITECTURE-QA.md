@@ -24,7 +24,7 @@ Everything else is derivative:
 | Non-goal | Why |
 |---|---|
 | **Runtime execution.** Blueprint does not run code, manage processes, or orchestrate deployments. It produces instructions, not automation. | Conflating instruction with execution makes skills untestable and environment-dependent. |
-| **Language/framework prescription.** Skills state principles ("use Protocol for interfaces"), not tools ("use FastAPI"). | Prescribing tools makes skills brittle. The project decides the tool. CLAUDE.md already flags this as an anti-pattern. |
+| **Framework/infrastructure prescription.** Blueprint prescribes conventions (pytest, Protocol, Pydantic), not frameworks. Convention choices are defaults overridable at the design gate. Framework and infrastructure choices belong to the user's project, not to Blueprint. | Convention defaults reduce decision fatigue without creating brittleness. The design gate is where project-specific overrides are surfaced and approved. |
 | **Replacing human judgement.** Gates exist because Claude should NOT make decomposition/design decisions unilaterally. | Value is structured collaboration, not autonomous generation. |
 | **Covering non-Python codebases.** shared-principles.md is Python-specific (pytest, click, dataclasses vs Pydantic). | Language-agnosticism would dilute conventions to uselessness. Better to be opinionated for one ecosystem. |
 | **Research workflow integration.** Research skills (paper-scout, idea-refiner, literature-mapper) are installed alongside but are NOT part of blueprint. | Different domain, different contracts, different users. Co-location ≠ integration. |

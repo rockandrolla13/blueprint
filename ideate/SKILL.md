@@ -114,3 +114,33 @@ End every ideation session with a **Decision Summary**:
 
 If the user hasn't decided yet, replace "Chosen approach" with "Open question" and state
 what information or experiment would resolve it.
+
+## Contract (BCS-1.0)
+
+### Mode
+READ-ONLY
+
+### Consumes
+- User's problem statement or idea (freeform)
+- No structured input required
+
+### Produces
+MUST emit a `## Handoff` section at the end of the output containing:
+- `Chosen approach:` — one sentence, closed decision
+- `Load-bearing assumptions:` — bullet list
+OPTIONAL inside Handoff:
+- `Key trade-off accepted:` — one sentence
+- `First thing to build:` — one sentence
+FORBIDDEN inside Handoff:
+- Comparison matrix
+- Multiple approaches (decision must be closed)
+- Implementation details
+
+### Degrees of Freedom
+- `## Handoff` header must be literal
+- `Chosen approach:` and `Load-bearing assumptions:` labels must be literal
+- All other phrasing is free
+- Content outside the Handoff section is unconstrained
+
+### Downstream Consumers
+- architect (reads Handoff only)

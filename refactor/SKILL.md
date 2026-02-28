@@ -21,6 +21,8 @@ observable behaviour.
 Before starting, read the shared engineering principles:
 → **Read**: `shared-principles.md` (sibling to this skill directory)
 
+**Input Rule:** Read ONLY the `## Handoff` section from the upstream skill output. Ignore all content outside the Handoff for structural decisions. Content outside the Handoff is for human context only.
+
 ## Phase 1: Understand Before Touching
 
 ### 1.1 Read First
@@ -78,17 +80,17 @@ List the changes as an ordered sequence. Each step must:
 
 Example:
 ```
-Step 1: Extract DataSource protocol from hardcoded file reads
+Step 1 [AR-DEP-001]: Extract DataSource protocol from hardcoded file reads
   Before: pipeline.py reads CSVs directly with pd.read_csv()
   After: DataSource protocol in core/protocols.py; CsvSource implements it
   Tests: existing tests pass unchanged; add test for CsvSource
 
-Step 2: Extract signal computation from monolithic run()
+Step 2 [CR-SOLID-001]: Extract signal computation from monolithic run()
   Before: signal logic embedded in 400-line run()
   After: SignalGenerator protocol; CarrySignal implements it
   Tests: new unit test for CarrySignal; integration test still passes
 
-Step 3: Introduce config dataclass
+Step 3 [CR-DRY-002]: Introduce config dataclass
   Before: 12 function parameters threaded through call chain
   After: PipelineConfig dataclass; single config object passed
   Tests: existing tests updated to use config fixture
@@ -178,3 +180,25 @@ After completing the refactoring:
   Pydantic (or vice versa) unless there's a specific technical reason. Match conventions.
 - **Don't gold-plate.** Refactor what's needed for the stated goal. If the code has other
   issues that aren't related to the current pain, note them but don't fix them unsolicited.
+
+## Contract (BCS-1.0)
+
+### Mode
+WRITES CODE (after refactoring-plan gate approval)
+
+### Consumes
+- MUST: `## Handoff` from refactoring-plan containing phased steps
+- Executes in dependency order (respects Depends on / Blocks)
+- Runs each step's Verification checklist after completion
+
+### Produces
+- Modified source files
+- Updated PLAN-*.md statuses via plan-tracker
+- No ## Handoff section (terminal skill)
+
+### Degrees of Freedom
+- Refactoring approach per step is refactor's to determine
+- May split steps into sub-steps but must not skip Verification
+
+### Downstream Consumers
+- None (terminal). Plan-tracker updates as side effects.

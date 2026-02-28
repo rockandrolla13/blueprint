@@ -47,6 +47,27 @@ and the premature abstraction becomes a coupling point.
 Don't abstract on the second occurrence. Abstract on the third. By then you have enough
 examples to know what the *actual* common pattern is, rather than guessing from two data points.
 
+## Opinionated Defaults
+
+Blueprint prescribes a small Python stack as sensible defaults. These are conventions that reduce decision fatigue at the scaffold stage, not frameworks.
+
+| Convention | Default | Override at gate? |
+|------------|---------|-------------------|
+| Config modelling | Pydantic BaseModel | Yes — dataclasses acceptable if approved at design gate |
+| Interfaces | typing.Protocol | Yes — ABC acceptable if approved at design gate |
+| Testing | pytest | No — fixed |
+| CLI entry points | click or typer | Yes — argparse acceptable |
+| Type hints | Required on all public functions | No — fixed |
+
+Blueprint does NOT prescribe:
+- Web frameworks (FastAPI, Django, Flask)
+- Infrastructure (Docker, K8s, Terraform)
+- Databases or ORMs
+- CI/CD tooling
+- Package managers beyond "use pyproject.toml"
+
+If a user's project already uses different conventions, the design gate is where this is surfaced and resolved. Scaffold follows whatever the approved design specifies.
+
 ## Extensibility Checklist
 
 Before considering any piece of work "done", verify:

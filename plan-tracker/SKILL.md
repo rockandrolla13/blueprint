@@ -19,6 +19,8 @@ multi-step workflow in blueprint flows through you.
 Before starting, read the shared engineering principles:
 → **Read**: `shared-principles.md` (sibling to this skill directory)
 
+**Input Rule:** Read ONLY the `## Handoff` section from the upstream skill output. Ignore all content outside the Handoff for structural decisions. Content outside the Handoff is for human context only.
+
 ## Three Modes
 
 ### Mode 1: Create Plan
@@ -56,18 +58,18 @@ Triggered at the start of any multi-step workflow. Takes input from upstream ski
 
 ### Phase 1: <name>
 
-| # | Step | Status | Notes |
-|---|------|--------|-------|
-| 1.1 | <description> | PENDING | |
-| 1.2 | <description> | PENDING | |
-| 1.3 | <description> | PENDING | |
+| # | Step | Source | Status | Notes |
+|---|------|--------|--------|-------|
+| 1.1 | <description> | <Finding IDs or design path> | PENDING | |
+| 1.2 | <description> | <Finding IDs or design path> | PENDING | |
+| 1.3 | <description> | <Finding IDs or design path> | PENDING | |
 
 ### Phase 2: <name>
 
-| # | Step | Status | Notes |
-|---|------|--------|-------|
-| 2.1 | <description> | PENDING | |
-| 2.2 | <description> | PENDING | |
+| # | Step | Source | Status | Notes |
+|---|------|--------|--------|-------|
+| 2.1 | <description> | <Finding IDs or design path> | PENDING | |
+| 2.2 | <description> | <Finding IDs or design path> | PENDING | |
 
 ## Verification Criteria
 
@@ -219,3 +221,41 @@ Plans are designed to be resumable. If the user returns after an interruption:
 
 For tasks with fewer than 3 steps, skip the plan file — the overhead isn't worth it.
 Just execute directly.
+
+## Contract (BCS-1.0)
+
+### Mode
+CROSS-CUTTING (active in every workflow)
+
+### Consumes
+Accepts input from multiple sources depending on workflow:
+
+1. **From refactoring-plan (W2 Refactor, W3 Redesign):**
+   - MUST: `## Handoff` containing phased steps with Finding IDs, Scope, Risk, Verification
+   - Creates PLAN-*.md with step-level tracking
+
+2. **From design (W1 Build, W4 Extend):**
+   - MUST: `## Handoff` containing file structure
+   - Creates PLAN-*.md tracking scaffold progress (files created, smoke tests passed)
+
+3. **From existing PLAN-*.md (any workflow, verification pass):**
+   - Reads current status table
+   - Updates statuses based on completed work
+   - Runs verification: checks all steps DONE or explicitly SKIPPED with reason
+
+### Produces
+- PLAN-*.md with status table: Step ID | Description | Status | Source | Depends On
+  - Source column: Finding IDs (for refactor plans) or design file paths (for build plans)
+- Status vocabulary: PENDING | IN PROGRESS | DONE | FAILED | SKIPPED | BLOCKED
+- Verification summary at end of workflow: total steps, completed, failed, skipped
+- No ## Handoff section (utility skill)
+
+### Degrees of Freedom
+- PLAN file naming: PLAN-<slug>.md
+- Additional table columns allowed
+- Verification summary format is free
+
+### Downstream Consumers
+- refactor (reads current status to determine next step)
+- scaffold (plan-tracker confirms design is approved before scaffold begins)
+- User (progress visibility)

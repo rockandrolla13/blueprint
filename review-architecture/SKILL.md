@@ -233,6 +233,11 @@ existing files with the same date and scope; if matches exist, increment the ver
 
 ### Report Template
 
+Every finding MUST include a Finding ID as the first element.
+Format: `AR-<DIM>-<NNN>`
+DIM is one of: BND, DEP, DRY, EXT, TST, ABS, PAR
+NNN is zero-padded sequential starting at 001.
+
 ```markdown
 # Architecture Review Report
 
@@ -267,7 +272,8 @@ existing files with the same date and scope; if matches exist, increment the ver
 
 [Ordered by severity: 🔴 → 🟠 → 🟡 → 🟢]
 
-### Finding 1: [title]
+### AR-DEP-001: [title]
+- **Finding ID:** AR-DEP-001
 - **Dimension:** [which]
 - **Severity:** [score]
 - **Location:** [files and lines]
@@ -335,3 +341,31 @@ review even starts. Report any failures as findings with their dimension and sev
   is appropriate. For large projects, 10–15.
 - **Honest about strengths.** If the architecture is sound, say so. Not every review needs
   to find problems. Positive highlights build trust and tell the user what to preserve.
+
+## Contract (BCS-1.0)
+
+### Mode
+READ-ONLY
+
+### Consumes
+- Python project directory and source files
+- No structured upstream Handoff required
+
+### Produces
+MUST emit a `## Handoff` section at the end of the output containing:
+- Scorecard table: Dimension | Score | Key Finding
+- Findings each with: Finding ID, Severity, Dimension, Location, Summary (1-2 sentences)
+- Finding IDs format: AR-<DIM>-<NNN> where DIM is: BND, DEP, DRY, EXT, TST, ABS, PAR
+OPTIONAL inside Handoff:
+- Dependency graph (Mermaid)
+FORBIDDEN inside Handoff:
+- Positive highlights (keep in report body only)
+
+### Degrees of Freedom
+- Scorecard uses 🟢🟡🟠🔴
+- Dimension: Boundaries | Dependencies | DRY | Extensibility | Testability | Abstraction | Parallelisation
+- Location: path/to/file.py or module.symbol
+
+### Downstream Consumers
+- refactoring-plan (reads Handoff only, merges with code-review)
+- architect (reads Handoff in W3 Redesign)

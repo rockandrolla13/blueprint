@@ -23,6 +23,8 @@ without breaking the system at any intermediate step.
 Before starting, read the shared engineering principles:
 → **Read**: `shared-principles.md` (sibling to this skill directory)
 
+**Input Rule:** Read ONLY the `## Handoff` section from the upstream skill output. Ignore all content outside the Handoff for structural decisions. Content outside the Handoff is for human context only.
+
 ## Why This Skill Exists
 
 The gap between "here are 15 findings" and "here's what to do Monday morning" is where
@@ -46,20 +48,19 @@ Aggregate findings from all available sources:
 
 ### 1.2 Deduplicate and Normalise
 
-Multiple reviews may flag the same underlying issue differently:
-- Code review: "strategy/carry.py imports data/bloomberg.py directly" (file-level)
-- Architecture review: "Dependency direction violation in strategy layer" (system-level)
-- These are the same finding at different granularities → merge into one item
+Aggregate findings by Finding ID. Deduplicate across code-review (CR-\*) and
+review-architecture (AR-\*) by matching IDs that reference the same location. Each plan
+step MUST list the Finding IDs it addresses.
 
-Produce a **consolidated findings list**:
+Produce a **consolidated findings list** preserving upstream Finding IDs:
 
-| ID | Finding | Source | Severity | Dimension |
+| Finding ID | Finding | Source | Severity | Dimension |
 |---|---|---|---|---|
-| F1 | Strategy imports infrastructure directly | arch-review | 🟠 | Dependency Direction |
-| F2 | Z-spread duplicated in two modules | arch-review | 🟠 | DRY |
-| F3 | God function pipeline.py:run() (400 lines) | code-review | 🟠 | SRP |
-| F4 | No tests for signal computation edge cases | arch-review | 🟡 | Testability |
-| F5 | Sequential loop over independent instruments | arch-review | 🟡 | Parallelisation |
+| AR-DEP-001 | Strategy imports infrastructure directly | review-architecture | 🟠 | Dependencies |
+| AR-DRY-001 | Z-spread duplicated in two modules | review-architecture | 🟠 | DRY |
+| CR-SOLID-001 | God function pipeline.py:run() (400 lines) | code-review | 🟠 | SOLID |
+| AR-TST-001 | No tests for signal computation edge cases | review-architecture | 🟡 | Testability |
+| AR-PAR-001 | Sequential loop over independent instruments | review-architecture | 🟡 | Parallelisation |
 
 ## Phase 2: Dependency Analysis
 
@@ -67,28 +68,28 @@ Produce a **consolidated findings list**:
 
 Some fixes must happen before others. Map the dependencies:
 
-- **F1 (dependency direction) must precede F4 (testability)**: can't write isolated tests
+- **AR-DEP-001 (dependency direction) must precede AR-TST-001 (testability)**: can't write isolated tests
   if the module still imports infrastructure directly
-- **F3 (god function) must precede F5 (parallelisation)**: can't parallelise a monolithic
+- **CR-SOLID-001 (god function) must precede AR-PAR-001 (parallelisation)**: can't parallelise a monolithic
   function — need to decompose it first to isolate the parallel-safe parts
-- **F2 (DRY) is independent**: can be done at any point
+- **AR-DRY-001 (DRY) is independent**: can be done at any point
 
 Produce a dependency DAG of the refactoring steps:
 
 ```mermaid
 graph TD
-    F1[F1: Fix dependency direction] --> F4[F4: Add edge case tests]
-    F3[F3: Decompose god function] --> F5[F5: Parallelise signal computation]
-    F2[F2: Extract shared z-spread] 
+    AR_DEP_001[AR-DEP-001: Fix dependency direction] --> AR_TST_001[AR-TST-001: Add edge case tests]
+    CR_SOLID_001[CR-SOLID-001: Decompose god function] --> AR_PAR_001[AR-PAR-001: Parallelise signal computation]
+    AR_DRY_001[AR-DRY-001: Extract shared z-spread]
 ```
 
 ### 2.2 Identify Parallel Tracks
 
 From the DAG, identify independent tracks that can be worked on in parallel (or in any order):
 
-- **Track A**: F1 → F4 (dependency direction, then testability)
-- **Track B**: F3 → F5 (decomposition, then parallelisation)
-- **Track C**: F2 (standalone)
+- **Track A**: AR-DEP-001 → AR-TST-001 (dependency direction, then testability)
+- **Track B**: CR-SOLID-001 → AR-PAR-001 (decomposition, then parallelisation)
+- **Track C**: AR-DRY-001 (standalone)
 
 Tracks can be interleaved if the user is working solo, or assigned to different sessions.
 
@@ -139,7 +140,7 @@ For each refactoring step, specify:
 ```markdown
 ### Step [N]: [Title]
 
-**Finding:** [F-ID and one-line description]
+**Finding IDs:** [CR-*/AR-* IDs this step addresses]
 **Priority score:** [Impact × 2 - Scope - Risk = X]
 **Scope:** [single-function / single-module / multi-module / cross-cutting]
 **Risk level:** [Low / Medium / High]
@@ -196,9 +197,9 @@ that the refactoring aims to improve]
 
 | Track | Steps | Theme | Can start immediately? |
 |---|---|---|---|
-| A | F1 → F4 | Dependency hygiene | Yes |
-| B | F3 → F5 | Decomposition & performance | Yes |
-| C | F2 | DRY cleanup | Yes |
+| A | AR-DEP-001 → AR-TST-001 | Dependency hygiene | Yes |
+| B | CR-SOLID-001 → AR-PAR-001 | Decomposition & performance | Yes |
+| C | AR-DRY-001 | DRY cleanup | Yes |
 
 ## Phase 1: [Theme] — Quick Wins
 **Target:** [what's true when done]
@@ -267,3 +268,42 @@ When the refactor skill picks up:
   this plan because [low impact / high risk / requires broader discussion]."
 - **The plan is a suggestion, not a mandate.** Present it, get feedback, adjust. The user
   may want to reorder based on what they're working on next.
+
+## Contract (BCS-1.0)
+
+### Mode
+READ-ONLY
+
+### Consumes
+- MUST: `## Handoff` from code-review (CR-* IDs) AND/OR review-architecture (AR-* IDs)
+- At least one must be present. If neither: STOP with CONTRACT VIOLATION.
+- Deduplicate by Finding ID, not prose.
+
+### Produces
+MUST emit a `## Handoff` section containing phased steps:
+- Phases: sequential integers. Steps: N.M format.
+- Each step MUST include:
+  - `Finding IDs:` — list of CR-* and/or AR-* IDs
+  - `Scope:` — single-function | single-module | multi-module | cross-cutting
+  - `Risk:` — low | medium | high
+  - `What changes:` — bullet list
+  - `What doesn't change:` — bullet list
+  - `Verification:` — checklist with [ ] items
+  - `Depends on:` — step IDs or "none"
+  - `Blocks:` — step IDs or "none"
+- Status vocabulary: PENDING | IN PROGRESS | DONE | FAILED | SKIPPED | BLOCKED
+OPTIONAL inside Handoff:
+- Dependency DAG (Mermaid)
+- Expected outcome scorecard (before/after)
+FORBIDDEN inside Handoff:
+- Steps without Finding IDs
+- Steps without Verification checklists
+
+### Degrees of Freedom
+- Step field labels must be literal
+- Scope and Risk vocabularies must be literal
+- Status vocabulary must be literal
+
+### Downstream Consumers
+- refactor (executes steps in order)
+- plan-tracker (creates PLAN-*.md from steps)

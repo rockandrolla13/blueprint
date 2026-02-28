@@ -20,6 +20,8 @@ structure is sound before that happens, so what emerges is maintainable and exte
 Before starting, read the shared engineering principles:
 → **Read**: `shared-principles.md` (sibling to this skill directory)
 
+**Input Rule:** Read ONLY the `## Handoff` section from the upstream skill output. Ignore all content outside the Handoff for structural decisions. Content outside the Handoff is for human context only.
+
 ## Phase 1: Problem Framing (keep this tight — 5 minutes, not 50)
 
 ### 1.1 Objective
@@ -125,7 +127,8 @@ Design the protocols so they're:
 - **Stable**: will this interface survive the next 3 requirement changes?
 
 ### 3.2 Configuration Design
-Specify the config structure using Pydantic for external config (files, CLI args):
+Specify the config structure using Pydantic for external config (files, CLI args)
+(default: Pydantic BaseModel; override requires explicit approval at this gate):
 
 ```python
 from pydantic import BaseModel
@@ -233,3 +236,35 @@ Before any architecture, state:
 
 This specification becomes a docstring in `core/types.py` or `strategy/` — it's documentation
 that lives with the code, not in a separate document that drifts.
+
+## Contract (BCS-1.0)
+
+### Mode
+READ-ONLY until approved at gate
+
+### Consumes
+- MUST: `## Handoff` from architect containing domain model, module table, abstraction decisions, rate-of-change map, DAG check
+- If DAG check is FAIL: STOP. "CONTRACT VIOLATION: architect reports dependency cycle. Cannot proceed."
+- If Handoff missing: STOP with CONTRACT VIOLATION listing missing fields.
+
+### Produces
+MUST emit a `## Handoff` section at the end of the output containing:
+- File structure in tree format using ├── and └── (scaffold copies this literally)
+- Protocol definitions as valid Python in a ```python fence (scaffold copies verbatim)
+- Config design with label: `Approach: Pydantic | Dataclasses | Other`
+OPTIONAL inside Handoff:
+- Dependency graph (Mermaid)
+- Data flow with schemas
+- Testing strategy
+FORBIDDEN inside Handoff:
+- Business logic beyond TODO skeletons
+- Unapproved third-party dependencies
+
+### Degrees of Freedom
+- `## Handoff` header must be literal
+- File structure MUST use ├── and └── tree format
+- Protocol code MUST be syntactically valid Python
+- Config approach label must be literal
+
+### Downstream Consumers
+- scaffold (reads Handoff only)

@@ -35,6 +35,11 @@ These are not in tension. Concise code has less surface area for bugs.
 
 ## Output Template
 
+Every finding MUST include a Finding ID as the first element.
+Format: `CR-<TYPE>-<NNN>`
+TYPE is one of: BUG, STYLE, SOLID, DRY, PERF, TYPE
+NNN is zero-padded sequential starting at 001.
+
 ```markdown
 # Code Review Report
 
@@ -47,10 +52,10 @@ These are not in tension. Concise code has less surface area for bugs.
 
 ## Findings
 
-### 1. [Finding title]
+### CR-BUG-001: [Finding title]
 - **Severity:** 🟠 Major
 - **Pillar:** Single Responsibility / Conciseness / etc.
-- **Location:** `filename.py`, lines X–Y
+- **Location:** `filename.py:L42-L58`
 
 BEFORE:
 [original snippet — quote the relevant code exactly]
@@ -62,8 +67,8 @@ WHY:
 [one-line rationale linking to the principle violated]
 
 ## Summary Table
-| # | Severity | Pillar | Location | Finding |
-|---|----------|--------|----------|---------|
+| Finding ID | Severity | Pillar | Location | Finding |
+|------------|----------|--------|----------|---------|
 
 ## Positive Highlights
 [2–3 things the code does well.]
@@ -97,3 +102,28 @@ When reviewer notes are provided instead of (or alongside) code:
 2. Extract distinct change requests. Clarify ambiguous items before starting.
 3. Use TaskCreate to create actionable tasks — break down complex feedback, make tasks specific and measurable.
 4. Mark first task as in_progress before starting work.
+
+## Contract (BCS-1.0)
+
+### Mode
+READ-ONLY
+
+### Consumes
+- Python source files from the user's project
+- No structured upstream Handoff required
+
+### Produces
+MUST emit a `## Handoff` section at the end of the output containing:
+- Summary table with columns: Severity | Pillar | Location | Finding | Finding ID
+- Finding IDs format: CR-<TYPE>-<NNN> where TYPE is: BUG, STYLE, SOLID, DRY, PERF, TYPE
+FORBIDDEN inside Handoff:
+- BEFORE/AFTER code snippets (keep in report body only)
+
+### Degrees of Freedom
+- Severity: 🟢🟡🟠🔴
+- Location: path/to/file.py or path/to/file.py:L42 or path/to/file.py:L42-L58
+- Pillar: Correctness | Style | SOLID | DRY | Performance | Types
+- Finding title text is free
+
+### Downstream Consumers
+- refactoring-plan (reads Handoff only, merges with review-architecture)
