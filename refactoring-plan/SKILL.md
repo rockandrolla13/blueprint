@@ -245,6 +245,7 @@ Before presenting the roadmap for review, verify your output against the contrac
 - [ ] Risk uses ONLY: low | medium | high
 - [ ] NO steps without Finding IDs
 - [ ] NO steps without Verification checklists
+- [ ] Output meets minimum: ≥ 1 phase with ≥ 2 steps, all MUST fields present
 
 If any check fails, fix the output before presenting it to the user.
 

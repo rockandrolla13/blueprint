@@ -303,6 +303,7 @@ Before saving the report, verify your output against the contract:
 - [ ] Handoff contains scorecard table with columns: Dimension | Score | Key Finding
 - [ ] Each finding in Handoff has: Finding ID, Severity, Dimension, Location, Summary (1-2 sentences)
 - [ ] Handoff contains NO positive highlights (keep those in report body only)
+- [ ] Output meets minimum: all 7 dimensions scored + ≥ 3 findings with IDs
 
 If any check fails, fix the output before saving.
 

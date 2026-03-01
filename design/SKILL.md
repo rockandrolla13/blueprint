@@ -200,6 +200,7 @@ Before presenting the design for review, verify your output against the contract
 - [ ] Config design includes `Approach:` label (Pydantic | Dataclasses | Other)
 - [ ] Handoff contains NO business logic beyond TODO skeletons
 - [ ] Handoff contains NO unapproved third-party dependencies
+- [ ] Output meets minimum: file structure ≥ 3 files + ≥ 1 Protocol + config approach
 
 If any check fails, fix the output before presenting it to the user.
 

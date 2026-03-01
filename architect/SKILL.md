@@ -266,6 +266,7 @@ Before presenting the architecture for review, verify your output against the co
 - [ ] Contains `Entry point:` — one of: ideate | review-architecture | direct
 - [ ] Handoff contains NO boundary conflict resolution rationale
 - [ ] Handoff contains NO modules not listed in the module table
+- [ ] Output meets minimum: module table ≥ 3 rows + domain model + DAG check
 
 If any check fails, fix the output before presenting it to the user.
 

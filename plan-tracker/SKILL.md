@@ -58,18 +58,18 @@ Triggered at the start of any multi-step workflow. Takes input from upstream ski
 
 ### Phase 1: <name>
 
-| # | Step | Source | Status | Notes |
-|---|------|--------|--------|-------|
-| 1.1 | <description> | <Finding IDs or design path> | PENDING | |
-| 1.2 | <description> | <Finding IDs or design path> | PENDING | |
-| 1.3 | <description> | <Finding IDs or design path> | PENDING | |
+| # | Step | Source | Status | Evidence | Notes |
+|---|------|--------|--------|----------|-------|
+| 1.1 | <description> | <Finding IDs or design path> | PENDING | | |
+| 1.2 | <description> | <Finding IDs or design path> | PENDING | | |
+| 1.3 | <description> | <Finding IDs or design path> | PENDING | | |
 
 ### Phase 2: <name>
 
-| # | Step | Source | Status | Notes |
-|---|------|--------|--------|-------|
-| 2.1 | <description> | <Finding IDs or design path> | PENDING | |
-| 2.2 | <description> | <Finding IDs or design path> | PENDING | |
+| # | Step | Source | Status | Evidence | Notes |
+|---|------|--------|--------|----------|-------|
+| 2.1 | <description> | <Finding IDs or design path> | PENDING | | |
+| 2.2 | <description> | <Finding IDs or design path> | PENDING | | |
 
 ## Verification Criteria
 
@@ -82,7 +82,12 @@ Triggered at the start of any multi-step workflow. Takes input from upstream ski
 
 ## Execution Log
 
-<append-only log — each entry timestamped>
+Every Execution Log entry MUST start with an ISO 8601 timestamp.
+Format: `YYYY-MM-DDTHH:MM:SS`, local time.
+
+Example:
+- 2026-02-28T15:30:00 — Step 1.1 started
+- 2026-02-28T15:32:00 — Step 1.1 DONE (commit: abc1234). Tests: 42 pass, 0 fail.
 ```
 
 **Rules for plan creation:**
@@ -125,7 +130,9 @@ to update step status.
 **Update protocol:**
 
 1. Before starting a step: set status to `IN PROGRESS`
-2. After completing a step: set status to `DONE`, add brief note of what changed
+2. After completing a step: set status to `DONE`, add brief note of what changed.
+   **Evidence:** If in a git repo, record the commit hash (e.g., `commit: abc1234`).
+   If not in git, record an ISO 8601 timestamp.
 3. On failure: set status to `FAILED`, add error description to Notes column
 4. Append an entry to the Execution Log with timestamp and detail
 
@@ -143,7 +150,7 @@ Do NOT continue to the next step without the user's explicit choice.
 Triggered when all phases are complete, or when the user asks "verify the plan" or
 "are we done?"
 
-**Verification produces three things:**
+**Verification produces four things:**
 
 #### 3.1 Completion Check
 
@@ -171,7 +178,24 @@ Compare pre-execution snapshot to current state:
 - **Key changes:** <bullet list of major structural changes>
 ```
 
-#### 3.3 Architecture Re-Review (if applicable)
+#### 3.3 Active Verification
+
+Run tests — execute, don't just report prior status:
+
+1. Run `pytest` (or the project's test command) and capture results
+2. Compare test count and pass rate to the pre-execution snapshot
+3. Verify every step has a terminal status (`DONE`, `SKIPPED`, or `FAILED`)
+4. Verify every `SKIPPED` and `FAILED` step has a reason in the Notes column
+
+```
+## Verification Summary
+- **Tests before:** <count> pass, <count> fail
+- **Tests after:** <count> pass, <count> fail
+- **Steps:** <done>/<total> DONE, <skipped> SKIPPED, <failed> FAILED
+- **All SKIPPED/FAILED have reasons:** yes/no
+```
+
+#### 3.4 Architecture Re-Review (if applicable)
 
 If the pre-execution snapshot included an architecture review score, re-run
 `review-architecture` and produce a before/after scorecard:
@@ -186,15 +210,24 @@ If the pre-execution snapshot included an architecture review score, re-run
 | ...                    | ...    | ...   |
 ```
 
-#### 3.4 Final Verdict
+#### 3.5 Final Verdict
 
 ```
 ## Verdict
 
-<COMPLETE / PARTIAL / INCOMPLETE>
+<COMPLETE / COMPLETE WITH EXCEPTIONS / INCOMPLETE / REGRESSION>
 
 <1-2 sentence summary: what was achieved, what remains if anything>
 ```
+
+**Verdict vocabulary:**
+
+| Verdict | Criteria |
+|---|---|
+| `COMPLETE` | All steps DONE, all tests pass |
+| `COMPLETE WITH EXCEPTIONS` | Some steps SKIPPED/FAILED with documented reasons, tests pass |
+| `INCOMPLETE` | Steps still PENDING or IN PROGRESS |
+| `REGRESSION` | Fewer tests passing than pre-execution snapshot |
 
 Write the verification output to the plan file itself, appended at the bottom under
 a `## Verification Report` heading. The plan file is now the complete record of what
@@ -246,8 +279,9 @@ Accepts input from multiple sources depending on workflow:
    - Runs verification: checks all steps DONE or explicitly SKIPPED with reason
 
 ### Produces
-- PLAN-*.md with status table: Step ID | Description | Status | Source | Depends On
+- PLAN-*.md with status table: Step ID | Description | Status | Source | Depends On | Evidence
   - Source column: Finding IDs (for refactor plans) or design file paths (for build plans)
+  - Evidence column: commit hash (git) or ISO timestamp (non-git) when DONE
 - Status vocabulary: PENDING | IN PROGRESS | DONE | FAILED | SKIPPED | BLOCKED
 - Verification summary at end of workflow: total steps, completed, failed, skipped
 - No ## Handoff section (utility skill)

@@ -128,6 +128,7 @@ Before presenting the Decision Summary, verify your output against the contract:
 - [ ] Handoff contains NO comparison matrix
 - [ ] Handoff contains NO multiple approaches (decision must be closed)
 - [ ] Handoff contains NO implementation details
+- [ ] Output meets minimum: chosen approach + at least 2 assumptions
 
 If any check fails, fix the output before presenting it to the user.
 

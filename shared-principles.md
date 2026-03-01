@@ -134,6 +134,24 @@ When the user does not approve at a gate, respond based on what they say:
 
 This protocol applies to all gated skills. Skills must not invent additional refusal branches.
 
+## Minimum Viable Output
+
+Every skill must produce at least the following. Outputs below this threshold should fail the Pre-Gate Self-Check.
+
+| Skill | Minimum output |
+|---|---|
+| ideate | Decision Summary with chosen approach (1 sentence) + at least 2 load-bearing assumptions |
+| architect | Module table with at least 3 rows + Mermaid domain model + DAG check result |
+| design | File structure (at least 3 files) + at least 1 Protocol definition + config approach |
+| code-review | Executive Summary + at least 2 findings with Finding IDs + Summary Table |
+| review-architecture | Scorecard with all 7 dimensions scored + at least 3 findings with Finding IDs |
+| refactoring-plan | At least 1 phase with at least 2 steps, each with all MUST fields |
+| scaffold | All files from design Handoff created + at least 1 smoke test file |
+| refactor | At least 1 step executed with verification checklist completed |
+| plan-tracker | Objective + at least 1 phase status table + verification criteria |
+
+If a skill cannot meet its minimum, it MUST state why: "Minimum not met: only 2 findings identified because [reason]. Proceeding with reduced output." The user decides at the gate.
+
 ## Validation
 
 After producing a skill output, optionally run:
