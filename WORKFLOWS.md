@@ -3,35 +3,75 @@
 ## How to Decide Which Workflow
 
 ```
-┌──────────────────────────────────────────────────────┐
-│                 What are you doing?                   │
-├───────────┬───────────┬──────────┬───────────────────┤
-│ Building  │ Improving │ Extending│ Not sure /         │
-│ new       │ existing  │ existing │ exploring          │
-│           │           │          │                    │
-│ → W1      │ Run arch  │ → W4     │ → W5              │
-│           │ review    │          │                    │
-│           │ first     │          │                    │
-│           │    │      │          │                    │
-│           │    ▼      │          │                    │
-│           │ Scorecard │          │                    │
-│           │ result:   │          │                    │
-│           │           │          │                    │
-│           │ 🟢🟡 → W2│          │                    │
-│           │ 🟠   → W3│          │                    │
-│           │ 🔴   → W3│          │                    │
-│           │ (or rare  │          │                    │
-│           │  rewrite) │          │                    │
-└───────────┴───────────┴──────────┴───────────────────┘
+Does code exist?
+│
+├── NO → Do you know what to build?
+│        ├── YES → W1 Build (ideate → architect → design → scaffold)
+│        └── NO  → W5 Explore (ideate → then W1/W3/W4)
+│
+└── YES → What's the goal?
+          │
+          ├── Something's wrong but I'm not sure what
+          │   → W0 Triage (review-arch + code-review → read findings → choose W2/W3/W4)
+          │
+          ├── Structure is painful, needs cleanup
+          │   → W2 Refactor (review-arch + code-review → refactoring-plan → refactor)
+          │
+          ├── Adding a feature to well-structured code
+          │   → W4 Extend (review-arch [recommended] → architect → design → scaffold)
+          │
+          ├── Fundamental redesign needed
+          │   → W3 Redesign (W2 + architect/design before refactoring)
+          │
+          └── Complete rewrite
+              → W6 Rewrite — GATE: "Are you being honest or just impatient?"
+                If impatient → W2 Refactor.
+                If honest → W1 Build with data migration plan.
 ```
 
 | Workflow | Name | When |
 |---|---|---|
+| W0 | Triage | Something's wrong but not sure what — need diagnostics first |
 | W1 | Build New | Greenfield project from scratch |
 | W2 | Refactor | Code works, structure is messy |
 | W3 | Redesign | Boundaries are wrong, code has value |
 | W4 | Extend | Add capability to existing system |
 | W5 | Explore | Vague problem, need to think before committing |
+| W6 | Rewrite | Beyond saving (are you sure?) |
+
+---
+
+## W0: Triage — "Something's wrong but I don't know what"
+
+**When:** User says the code is broken, slow, flaky, confusing, or "needs work" but
+hasn't diagnosed whether it's a structural problem, a code quality problem, or both.
+
+**Skill chain:** `review-architecture + code-review → findings → user chooses next workflow`
+
+**Steps:**
+
+1. Run review-architecture on the codebase (produces scored diagnostic + findings)
+2. Run code-review on the codebase (produces severity-ranked findings)
+3. Present combined findings to the user
+4. **ROUTING GATE:** Based on findings, recommend a workflow:
+
+| Findings show | Recommend | Why |
+|---|---|---|
+| Structural problems (boundary violations, dependency cycles, god modules) but code quality is acceptable | W2 Refactor | Structure needs fixing, code is fine |
+| Code quality problems (bugs, style, DRY) but structure is sound | W2 Refactor (lightweight — may only need code-level fixes) | Structure is fine, fix the code |
+| Both structural and code quality problems | W2 Refactor (full) | Fix both |
+| Structure is fundamentally wrong for the use case | W3 Redesign | Need to rethink boundaries before fixing |
+| Structure is sound, user actually wants to add something | W4 Extend | Triage revealed the codebase is fine — proceed to feature work |
+
+Present the recommendation with rationale. The user chooses.
+
+**Key property:** W0 produces NO plan and modifies NO code. It only produces diagnostic
+artifacts (review reports) and a routing recommendation. The review Handoff sections
+flow directly into whichever workflow the user picks — no work is wasted.
+
+**Note:** W0's review outputs are the SAME artifacts that W2 starts with. If the user
+picks W2 after triage, W2 skips its own review step and consumes the W0 outputs directly.
+This prevents running diagnostics twice.
 
 ---
 
@@ -205,17 +245,30 @@ claude "verify the plan"
 
 **When:** Adding a new capability (new strategy, new data source, new CLI command, new pipeline stage) to an existing system.
 
-**Skill chain:** `review-architecture (optional) → architect → design → plan-tracker → scaffold → plan-tracker (verify)`
+**Skill chain:** `review-architecture [recommended] → architect → design → plan-tracker → scaffold → plan-tracker (verify)`
+
+### Step 0 (Recommended): Review existing architecture
+
+Before designing the extension, run review-architecture on the existing codebase.
+This catches stale assumptions about boundaries.
+
+**GATE:** "I've reviewed the existing architecture. [Summary of current boundaries].
+Do you want to proceed to architect with this context, or skip the review?"
+
+- If the user skips: proceed to architect with direct entry (no upstream Handoff)
+- If the user proceeds: architect receives the review-architecture Handoff and uses
+  the findings to inform where the new feature fits
+
+**Why this matters:** Extending without reviewing means designing against your mental
+model of the boundaries, not the actual boundaries. If the model is wrong, you get
+shotgun surgery — the new feature touches 5 files instead of 1.
 
 ```bash
 cd ~/Gitrepos/existing-project
 
-# Step 0 (optional but recommended): Health check first
-# If you haven't reviewed this repo recently, do it now.
-# Adding features to a weak foundation makes the foundation weaker.
+# Step 0 (recommended): Review architecture — see above
 claude "review the architecture of this project"
-# → If scorecard is mostly 🟢/🟡: proceed
-# → If scorecard has 🟠/🔴: consider W2 or W3 first
+# → GATE: proceed with context, or skip?
 
 # Step 1: Where does the new capability fit?
 claude "I want to add [describe capability] to this project.
@@ -336,6 +389,7 @@ done
 
 | Situation | Workflow | First command |
 |---|---|---|
+| "Something's wrong but I'm not sure what" | W0 Triage | `claude "review the architecture..."` then `claude "review the code..."` |
 | "I want to build something new" | W1 Build | `claude "ideate..."` |
 | "This code works but it's messy" | W2 Refactor | `claude "review the architecture..."` |
 | "The structure is fundamentally wrong" | W3 Redesign | `claude "review the architecture..."` |
@@ -351,6 +405,9 @@ Workflows aren't always linear. Common mid-workflow transitions:
 
 | During | You discover | Switch to |
 |---|---|---|
+| W0 Triage | Structure is sound, user wants to add something | W4 Extend |
+| W0 Triage | Structural or code quality problems found | W2 Refactor |
+| W0 Triage | Boundaries fundamentally wrong | W3 Redesign |
 | W2 Refactor | Boundaries are wrong, not just messy | W3 Redesign |
 | W3 Redesign | A specific module needs extending too | Finish W3, then W4 |
 | W4 Extend | Existing structure can't accommodate the feature | W3 Redesign first, then W4 |

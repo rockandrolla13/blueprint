@@ -92,6 +92,11 @@ Triggered at the start of any multi-step workflow. Takes input from upstream ski
 - Capture the pre-execution snapshot immediately — file count, line count, test status
 - If an architecture review was run, record the scorecard scores
 
+**Pre-Update Check:** Before creating the plan file, verify the upstream Handoff:
+- [ ] Source Handoff contains phased steps (from refactoring-plan) OR file structure (from design)
+- [ ] Each step has a Source reference (Finding IDs or design file paths)
+If checks fail, stop and request the missing upstream output.
+
 **CHECKPOINT — STOP after creating the plan.**
 
 Present a summary:

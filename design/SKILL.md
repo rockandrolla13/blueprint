@@ -190,6 +190,19 @@ project/
 
 Justify any deviations from this standard layout.
 
+## Pre-Gate Self-Check
+
+Before presenting the design for review, verify your output against the contract:
+
+- [ ] `## Handoff` section exists at the end of the output
+- [ ] File structure uses ├── and └── tree format
+- [ ] Protocol definitions are syntactically valid Python in a ```python fence
+- [ ] Config design includes `Approach:` label (Pydantic | Dataclasses | Other)
+- [ ] Handoff contains NO business logic beyond TODO skeletons
+- [ ] Handoff contains NO unapproved third-party dependencies
+
+If any check fails, fix the output before presenting it to the user.
+
 ## Phase 5: Design Review Checkpoint
 
 **STOP.** Present the design as a concise summary:

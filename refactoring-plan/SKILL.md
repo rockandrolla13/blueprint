@@ -234,6 +234,20 @@ that the refactoring aims to improve]
 [Findings that were deprioritised and why. Keeps scope honest.]
 ```
 
+## Pre-Gate Self-Check
+
+Before presenting the roadmap for review, verify your output against the contract:
+
+- [ ] `## Handoff` section exists at the end of the output
+- [ ] Steps use N.M format (phase.step)
+- [ ] Every step has: Finding IDs, Scope, Risk, What changes, What doesn't change, Verification, Depends on, Blocks
+- [ ] Scope uses ONLY: single-function | single-module | multi-module | cross-cutting
+- [ ] Risk uses ONLY: low | medium | high
+- [ ] NO steps without Finding IDs
+- [ ] NO steps without Verification checklists
+
+If any check fails, fix the output before presenting it to the user.
+
 ## Handoff: Create Tracked Plan
 
 After the roadmap is approved, create a `PLAN-<task-name>.md` file in the target directory

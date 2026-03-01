@@ -105,3 +105,19 @@ These are the user's established patterns — respect them in all generated code
   ```
 - **Testing**: `pytest`, with fixtures for shared setup. Property-based testing (`hypothesis`) for numerical code where edge cases matter.
 - **Logging**: `logging` module with structured output. No print statements in library code.
+
+## Gate Behaviour
+
+Every skill with a checkpoint gate follows this protocol:
+
+### Three Outcomes
+
+1. **Approved** — user says "looks good", "approved", "yes", or equivalent. Proceed to the next phase or hand off to the downstream skill.
+2. **Revision requested** — user asks for changes. Revise the output, re-run the Pre-Gate Self-Check, and present again. Do not proceed until approved.
+3. **Contract violation** — the Pre-Gate Self-Check fails and cannot be fixed. Stop and report which contract requirement is unmet.
+
+### Rules
+
+- Gates are mandatory. Never skip a gate, even if the user says "just do it" — the gate exists to catch structural errors before they propagate.
+- A gate approval covers only the output presented. If you materially change the output after approval, re-present at the gate.
+- If the user approves with caveats ("looks good but change X"), apply the change and confirm before proceeding. Do not silently proceed with the caveat unaddressed.

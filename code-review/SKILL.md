@@ -74,6 +74,17 @@ WHY:
 [2–3 things the code does well.]
 ```
 
+## Pre-Gate Self-Check
+
+Before saving the report, verify your output against the contract:
+
+- [ ] Every finding has a Finding ID in format CR-<TYPE>-<NNN>
+- [ ] `## Handoff` section exists at the end of the output
+- [ ] Handoff contains summary table with columns: Severity | Pillar | Location | Finding | Finding ID
+- [ ] Handoff contains NO BEFORE/AFTER code snippets (keep those in report body only)
+
+If any check fails, fix the output before saving.
+
 ## Constraints
 
 - Every AFTER sketch must be semantically equivalent to its BEFORE. If a change would alter behaviour, flag it explicitly.

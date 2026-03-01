@@ -253,6 +253,22 @@ Some things don't belong to any single module:
 Cross-cutting concerns are NOT modules — they're policies applied across modules. Don't
 create a `utils/` or `common/` dumping ground for these. Each has a specific home.
 
+## Pre-Gate Self-Check
+
+Before presenting the architecture for review, verify your output against the contract:
+
+- [ ] `## Handoff` section exists at the end of the output
+- [ ] Contains domain model as a Mermaid diagram (in a ```mermaid fence)
+- [ ] Contains module decomposition table with columns: Module | Responsibility | Knows About | Doesn't Know About | Changes When
+- [ ] Abstraction decisions use ONLY: Module / Package / Class / Protocol / Function / Dataclass / Config
+- [ ] Rate-of-change map uses ONLY: Stable / Moderate / Volatile
+- [ ] Contains `DAG check: PASS` or `DAG check: FAIL`
+- [ ] Contains `Entry point:` — one of: ideate | review-architecture | direct
+- [ ] Handoff contains NO boundary conflict resolution rationale
+- [ ] Handoff contains NO modules not listed in the module table
+
+If any check fails, fix the output before presenting it to the user.
+
 ## Phase 4: Architecture Review Checkpoint
 
 **STOP.** Present the complete decomposition:

@@ -15,9 +15,10 @@ stage costs the most downstream — this is where gate-before-code matters most.
 bad boundaries mean shotgun surgery.
 
 Everything else is derivative:
-- W3 (Redesign) = W2 + architect/design inserted before refactoring
-- W5 (Explore) = just ideate, exits into W1/W3/W4
-- W6 (Rewrite) = rare, gated by "are you being honest or just impatient?"
+- W0 = review-arch + code-review, then route to W2/W3/W4 (no plan, no code)
+- W3 = W2 + architect/design before refactoring
+- W5 = ideate only, exits into W1/W3/W4
+- W6 = rare, gated against impatience
 
 ## 2. Non-Goals
 

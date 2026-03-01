@@ -115,6 +115,19 @@ End every ideation session with a **Decision Summary**:
 If the user hasn't decided yet, replace "Chosen approach" with "Open question" and state
 what information or experiment would resolve it.
 
+## Pre-Gate Self-Check
+
+Before presenting the Decision Summary, verify your output against the contract:
+
+- [ ] `## Handoff` section exists at the end of the output
+- [ ] Contains `Chosen approach:` — one sentence, closed decision (not "Open question")
+- [ ] Contains `Load-bearing assumptions:` — bullet list
+- [ ] Handoff contains NO comparison matrix
+- [ ] Handoff contains NO multiple approaches (decision must be closed)
+- [ ] Handoff contains NO implementation details
+
+If any check fails, fix the output before presenting it to the user.
+
 ## Contract (BCS-1.0)
 
 ### Mode

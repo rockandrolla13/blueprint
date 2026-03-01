@@ -294,6 +294,18 @@ NNN is zero-padded sequential starting at 001.
 Suggest a trigger, not a calendar interval.]
 ```
 
+## Pre-Gate Self-Check
+
+Before saving the report, verify your output against the contract:
+
+- [ ] Every finding has a Finding ID in format AR-<DIM>-<NNN>
+- [ ] `## Handoff` section exists at the end of the output
+- [ ] Handoff contains scorecard table with columns: Dimension | Score | Key Finding
+- [ ] Each finding in Handoff has: Finding ID, Severity, Dimension, Location, Summary (1-2 sentences)
+- [ ] Handoff contains NO positive highlights (keep those in report body only)
+
+If any check fails, fix the output before saving.
+
 ## Quick Constraint Checks
 
 Before the full dimensional review, run these fast binary checks against the codebase.
