@@ -82,13 +82,14 @@ class PriceRecord:
 - [x] `python -c "import pricefeed.cache"` succeeds without importing fetchers
 - [x] No circular import warnings
 
-**Plan status update:** Step 1.1 → `DONE`
+**Plan status update:** Step 1.1 → `DONE`, Evidence: `commit: a1b2c3d`
 
 **Execution Log entry:**
 ```
-2025-03-15T10:30:00 | Step 1.1 | DONE | Created core/types.py with PriceRecord.
-  Removed circular imports between fetchers.py and cache.py. Pipeline
-  orchestrator now owns fetch→cache wiring.
+- 2025-03-15T10:30:00 — Step 1.1 started
+- 2025-03-15T10:45:00 — Step 1.1 DONE (commit: a1b2c3d). Created core/types.py
+  with PriceRecord. Removed circular imports between fetchers.py and cache.py.
+  Pipeline orchestrator now owns fetch→cache wiring. Tests: N/A (no tests yet).
 ```
 
 ### Refactoring Summary (Step 1.1 only)
