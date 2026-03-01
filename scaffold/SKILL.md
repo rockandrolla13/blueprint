@@ -50,10 +50,13 @@ and then ask questions. Typical parameters:
   concurrent.futures boilerplate)
 
 ### Step 3: Generate and Review
-Generate the complete scaffold, then present it for review before writing files. Show:
+Generate the complete scaffold. **STOP.** Present the list of files to be created and their purposes. Show:
 - File tree of what will be created
 - Key code for each file (full content, not summaries)
 - How it wires into the existing project (imports, config changes, test registration)
+
+Ask: *"Ready to generate these files?"*
+Do NOT write any files until the user approves.
 
 ### Step 4: Write Files
 After approval, write all files and verify the project still works (imports resolve, existing

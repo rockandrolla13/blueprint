@@ -14,9 +14,16 @@ description: >
 # Refactor Skill
 
 You are operating as a Code Reviewer focused on structural improvement. The invariant:
-**external behaviour must not change.** Refactoring is about improving the internal structure —
-readability, maintainability, extensibility — while keeping the same inputs, outputs, and
-observable behaviour.
+**external behaviour must not change.** Behaviour preservation means ALL of the following:
+
+1. All existing tests pass (non-negotiable)
+2. No public interface changes (function signatures, class APIs, return types) without
+   explicit user acknowledgment at the step's gate
+3. No change to observable outputs for the same inputs
+4. Performance changes are flagged but allowed (see Performance-Sensitive Code in Phase 4)
+
+Refactoring is about improving the internal structure — readability, maintainability,
+extensibility — while satisfying these constraints.
 
 Before starting, read the shared engineering principles:
 → **Read**: `shared-principles.md` (sibling to this skill directory)
@@ -42,6 +49,36 @@ Ask the user (or infer from context): what's the actual problem?
 
 The pain determines the refactoring strategy. Don't apply generic "clean code" rules —
 target the actual problem.
+
+### 1.3 Test Coverage Check
+
+Before starting any refactoring step:
+
+1. Check if tests exist for the code being refactored.
+2. If tests exist: proceed. Record baseline test results.
+3. If NO tests exist for the affected code:
+
+**STOP.** Do not refactor untested code. Instead:
+
+*"No tests cover [affected module/function]. Refactoring untested code is rewriting
+with plausible deniability — there is no way to verify behaviour is preserved.*
+
+*Options:*
+1. *Write characterization tests first (recommended) — these capture current behaviour
+   as assertions, then refactor against them*
+2. *Skip this step and move to the next step in the plan*
+3. *Proceed with explicit acknowledgment that behaviour may change*
+
+*Which option?"*
+
+If the user chooses option 1, write characterization tests that:
+- Call each public function with representative inputs
+- Assert on the current outputs (even if the outputs seem wrong — capture reality,
+  not intent)
+- Cover error paths if reachable
+- Are clearly labeled: `# Characterization test — captures existing behaviour, not specification`
+
+Then proceed with refactoring against those tests.
 
 ## Phase 2: Structural Diagnosis
 
@@ -126,7 +163,40 @@ Execute each refactoring step in order:
 3. Add new tests for the new structure
 4. Commit conceptually (in Claude Code) or present the change (in claude.ai)
 
-### 4.2 Apply Clean Code Throughout
+### 4.2 Risk Escalation
+
+Before executing any step with Risk: high (from the refactoring plan):
+
+1. Check if tests cover the affected code path.
+2. If Risk is high AND no tests cover it:
+
+**STOP.** Present:
+
+*"Step [N.M] is high-risk and the affected code has no test coverage.*
+
+*Options:*
+1. *Write characterization tests for this code path first (recommended)*
+2. *Skip this step (mark as SKIPPED with reason: 'untested high-risk')*
+3. *Proceed with explicit user acknowledgment of risk*
+
+*Which option?"*
+
+Do not silently proceed through high-risk untested steps.
+
+### 4.3 Performance-Sensitive Code
+
+If the code being refactored is in a performance-sensitive context — loop bodies,
+per-tick/per-row computation, hot paths, or code with explicit performance comments —
+note after completing the step:
+
+*"Performance note: This refactoring changed [what] in a [hot path / loop body /
+per-row computation]. The structural improvement is [what]. If this is latency-sensitive,
+benchmark before and after."*
+
+Do not block on performance concerns — flag them and continue. The user decides whether
+to benchmark.
+
+### 4.4 Apply Clean Code Throughout
 As you refactor, enforce:
 
 **Naming**:
@@ -144,14 +214,14 @@ As you refactor, enforce:
 - If a module has more than 5 public functions/classes, consider splitting
 - `__init__.py` exports the public API — nothing else
 
-### 4.3 DRY Application
+### 4.5 DRY Application
 When you find duplication:
 1. Confirm it's **knowledge duplication** (same business rule), not just **code similarity** (similar structure, different purpose)
 2. If genuine duplication and this is the 3rd+ occurrence → extract
 3. If only 2 occurrences → leave a comment noting the similarity but don't extract yet
 4. Place extracted code at the appropriate level in the dependency graph (not in a `utils.py` dumping ground)
 
-### 4.4 Parallelisation Opportunities
+### 4.6 Parallelisation Opportunities
 While restructuring, flag any loops or sequential processing that could be parallelised
 now that the code is properly decomposed. Extracting a pure function from a monolith often
 reveals that it can be mapped over inputs concurrently. Note these as "parallelisation-ready"

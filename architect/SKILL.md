@@ -271,7 +271,7 @@ If any check fails, fix the output before presenting it to the user.
 
 ## Phase 4: Architecture Review Checkpoint
 
-**STOP.** Present the complete decomposition:
+**STOP.** Present the domain model, module table, and dependency verification:
 
 1. **Domain model** — concepts and their relationships (Mermaid diagram)
 2. **Rate-of-change map** — what changes when and why
@@ -282,11 +282,8 @@ If any check fails, fix the output before presenting it to the user.
    toward infrastructure
 6. **Cross-cutting concerns** — how logging, config, errors, parallelisation are handled
 
-Ask: *"Does this decomposition feel right for the domain? Are the boundaries where you'd
-expect them? Anything I'm splitting that should stay together, or bundling that should split?"*
-
-**Do NOT proceed until the user approves.** The entire purpose of this skill is to get the
-decomposition right before the design skill wires things together.
+Ask: *"Does this decomposition look right?"*
+Do NOT proceed to design until the user approves. If partially approved, state which sections are approved and revise only the rejected parts.
 
 ## Handoff to Design
 

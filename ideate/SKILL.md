@@ -115,6 +115,9 @@ End every ideation session with a **Decision Summary**:
 If the user hasn't decided yet, replace "Chosen approach" with "Open question" and state
 what information or experiment would resolve it.
 
+**STOP.** Present the Decision Summary. Ask: *"Does this approach make sense, or should I explore different options?"*
+Do NOT proceed to architecture until the user approves the chosen approach.
+
 ## Pre-Gate Self-Check
 
 Before presenting the Decision Summary, verify your output against the contract:

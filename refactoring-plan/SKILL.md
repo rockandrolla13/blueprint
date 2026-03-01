@@ -248,6 +248,9 @@ Before presenting the roadmap for review, verify your output against the contrac
 
 If any check fails, fix the output before presenting it to the user.
 
+**STOP.** Present the phased plan with step count and risk summary. Ask: *"Ready to begin execution?"*
+Do NOT proceed to refactoring until the user approves the plan.
+
 ## Handoff: Create Tracked Plan
 
 After the roadmap is approved, create a `PLAN-<task-name>.md` file in the target directory

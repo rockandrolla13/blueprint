@@ -121,3 +121,24 @@ Every skill with a checkpoint gate follows this protocol:
 - Gates are mandatory. Never skip a gate, even if the user says "just do it" — the gate exists to catch structural errors before they propagate.
 - A gate approval covers only the output presented. If you materially change the output after approval, re-present at the gate.
 - If the user approves with caveats ("looks good but change X"), apply the change and confirm before proceeding. Do not silently proceed with the caveat unaddressed.
+
+### Refusal Protocol
+
+When the user does not approve at a gate, respond based on what they say:
+
+| User says | Skill should |
+|---|---|
+| "No, X is wrong" or "Fix X" | Revise the specific section. Re-present ONLY the changed parts, prefixed with: "Revised [section]. Other sections unchanged." |
+| "I'm not sure, what about Y?" | Present Y as an alternative. Compare trade-offs with the current approach. Ask the gate question again. |
+| "Back up" or "Let me rethink" | Acknowledge. Suggest re-running the upstream skill. Do not attempt to patch the current output. |
+
+This protocol applies to all gated skills. Skills must not invent additional refusal branches.
+
+## Validation
+
+After producing a skill output, optionally run:
+
+    python tools/contract_lint.py <output-file> --skill <skill-name>
+
+This checks contract compliance. Recommended before committing review artifacts
+to the reviews/ directory.

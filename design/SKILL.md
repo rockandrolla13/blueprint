@@ -205,7 +205,7 @@ If any check fails, fix the output before presenting it to the user.
 
 ## Phase 5: Design Review Checkpoint
 
-**STOP.** Present the design as a concise summary:
+**STOP.** Present the file structure, protocols, and config design:
 
 1. **Objective** — one sentence
 2. **Core abstraction** — what and why
@@ -217,11 +217,8 @@ If any check fails, fix the output before presenting it to the user.
 8. **File structure** — proposed tree
 9. **Risks & trade-offs** — what could go wrong, what you're deliberately not doing
 
-Ask: *"Does this design look right? Anything to adjust before I start building?"*
-
-**Do NOT write implementation code until the user approves.** If they push back, iterate
-on the design. If they say "looks good", proceed to implementation following the dependency
-graph order (build leaves first, test each component before wiring).
+Ask: *"Does this design look right?"*
+Do NOT write implementation code until the user approves. If partially approved, state which sections are approved and revise only the rejected parts.
 
 ## Calibration
 

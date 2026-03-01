@@ -97,17 +97,14 @@ Triggered at the start of any multi-step workflow. Takes input from upstream ski
 - [ ] Each step has a Source reference (Finding IDs or design file paths)
 If checks fail, stop and request the missing upstream output.
 
-**CHECKPOINT — STOP after creating the plan.**
-
-Present a summary:
+**STOP.** Present the plan summary:
 - Objective (1 sentence)
 - Number of phases and total steps
 - Pre-execution snapshot (files, lines, test status)
 - First phase name and step count
 
-Then ask: *"Plan created at `PLAN-<name>.md`. Ready to begin execution?"*
-
-Do NOT proceed to execution until the user confirms.
+Ask: *"Plan created at `PLAN-<name>.md`. Ready to begin execution?"*
+Do NOT begin execution until the user approves.
 
 ### Mode 2: Update Plan
 
