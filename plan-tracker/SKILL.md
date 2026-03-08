@@ -71,11 +71,29 @@ Triggered at the start of any multi-step workflow. Takes input from upstream ski
 | 2.1 | <description> | <Finding IDs or design path> | PENDING | | |
 | 2.2 | <description> | <Finding IDs or design path> | PENDING | | |
 
+## Invariants
+
+<conditions that must remain true after EVERY step — violation = immediate stop>
+
+| Invariant | Check Command | Status |
+|-----------|---------------|--------|
+| no-circular-imports | `python -c "import <package>"` | |
+| tests-pass | `pytest --tb=no -q` | |
+| all-public-typed | (manual or mypy) | |
+| <project-specific> | <command> | |
+
+**Rule:** After each step, verify all invariants. If ANY fails:
+1. STOP immediately
+2. Do NOT proceed to next step
+3. Record which invariant failed and why
+4. Ask user: Fix now, or rollback step?
+
 ## Verification Criteria
 
 <what must be true when all phases are DONE — derived from objective>
 
 - [ ] All steps DONE or explicitly SKIPPED with reason
+- [ ] All invariants passing
 - [ ] Tests pass
 - [ ] <objective-specific criterion>
 - [ ] <objective-specific criterion>
@@ -130,11 +148,24 @@ to update step status.
 **Update protocol:**
 
 1. Before starting a step: set status to `IN PROGRESS`
-2. After completing a step: set status to `DONE`, add brief note of what changed.
+2. After completing a step:
+   a. Run all invariant checks from the Invariants table
+   b. IF any invariant fails → set status to `FAILED`, record which invariant broke
+   c. IF all invariants pass → set status to `DONE`, add brief note of what changed
    **Evidence:** If in a git repo, record the commit hash (e.g., `commit: abc1234`).
    If not in git, record an ISO 8601 timestamp.
 3. On failure: set status to `FAILED`, add error description to Notes column
 4. Append an entry to the Execution Log with timestamp and detail
+
+**Invariant failure protocol:**
+
+When an invariant fails after a step:
+1. Record the failure in the Execution Log: `Step X.Y broke invariant: <name>`
+2. Present the user with options:
+   - **Fix forward** — address the invariant violation, then re-verify
+   - **Rollback** — undo the step (git reset or manual), mark step as `FAILED`
+   - **Override** — mark invariant as temporarily suspended with reason (use sparingly)
+3. Do NOT proceed to the next step until invariants are green
 
 **On FAILED status — stop and ask the user:**
 

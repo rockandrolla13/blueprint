@@ -19,6 +19,54 @@ Multi-step tasks require explicit planning before implementation.
    * Success criteria per phase
    * Risk register
 
+## Intent Declaration
+
+Before any code change, Claude must state:
+
+```
+INTENT: [what I'm about to do — one line]
+NOT DOING: [what I'm explicitly not touching]
+AFFECTED FILES: [list]
+VERIFY BY: [how to confirm success]
+```
+
+**Why**: Catches misalignment before execution. User can correct course before code is written.
+
+**When to use**: Every code modification, refactor, or file creation. Skip only for trivial single-line fixes.
+
+**Example**:
+```
+INTENT: Extract validate_token() from auth.py into its own module
+NOT DOING: Changing validation logic, adding tests, modifying callers yet
+AFFECTED FILES: src/auth.py, src/token_validator.py (new)
+VERIFY BY: Import succeeds, existing tests pass
+```
+
+## State Tracking
+
+For multi-step tasks, Claude maintains a STATE block and references it before each action:
+
+```
+STATE:
+  plan: docs/plans/2024-03-07-auth-refactor.md
+  current_step: 2.3
+  completed: [1.1, 1.2, 2.1, 2.2]
+  blocked: []
+  files_modified: [src/auth.py, src/utils.py]
+  tests: PASSING
+  invariants_checked: [no-circular-imports, all-public-typed]
+```
+
+**Update STATE after each step.** If resuming after interruption, read STATE first.
+
+**Invariants**: Define what must remain true. Check after each step:
+- `no-circular-imports`: Run import check
+- `all-public-typed`: All public functions have type hints
+- `tests-pass`: Test suite green
+- Custom project invariants as needed
+
+If an invariant breaks, STOP. Do not proceed. State which invariant failed and why.
+
 ## What This Repo Is
 
 Composable Claude skills for architecture-first engineering. Not software — instruction
