@@ -11,7 +11,11 @@ description: >
   or "before I build more, check the foundations". This complements the code-review skill — that
   skill reviews individual files for Clean Code compliance, this skill reviews the system-level
   structure. Do NOT trigger for file-level code review (use code-review), refactoring execution
-  (use refactor), or new system design (use architect + design).
+  (use refactor), or new system design (use architect + design). Do NOT trigger for module
+  interface depth, cognitive load, information hiding, or "this is hard to navigate" — that is
+  review-depth. The split: this skill measures what it costs to CHANGE the code, review-depth
+  measures what it costs to UNDERSTAND it. Do NOT trigger for conflicts between instruction
+  files, skills, or rule sets — that is compat-audit.
 ---
 
 # Architecture Review Skill
@@ -306,6 +310,14 @@ Before saving the report, verify your output against the contract:
 - [ ] Output meets minimum: all 7 dimensions scored + ≥ 3 findings with IDs
 
 If any check fails, fix the output before saving.
+
+## Review Checkpoint
+
+**STOP.** Present the scorecard and findings in the session first. Then ask:
+*"Save this to `reviews/YYYY_mm_dd_architecture_review.md`?"*
+
+Do NOT write the file until the user approves. This skill declares `Mode: READ-ONLY`; writing
+a versioned file into the repo unasked would make that declaration false.
 
 ## Quick Constraint Checks
 

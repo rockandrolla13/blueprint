@@ -8,7 +8,10 @@ description: >
   "progressive disclosure", "make it easier to understand", "reduce complexity",
   "hard to find things", or wants to enforce Ousterhout-style deep module principles.
   Do NOT trigger for general code review (use code-review), architecture scoring
-  (use review-architecture), or refactoring execution (use refactor).
+  (use review-architecture), or refactoring execution (use refactor). The split against
+  review-architecture: that skill measures what it costs to CHANGE the code, this one measures
+  what it costs to UNDERSTAND it. Do NOT trigger for conflicts between instruction files,
+  skills, or rule sets — that is compat-audit, which reads instruction files, never source code.
 ---
 
 # Review: Deep Modules & Progressive Disclosure
@@ -89,6 +92,16 @@ Look for these specific anti-patterns:
 - **`__init__.py` that re-exports everything**: Defeats progressive disclosure by
   flattening the module hierarchy
 
+## Scope Checkpoint
+
+**STOP.** Present the module census — every module with its interface size, implementation
+depth, depth ratio, and any shallow-pattern flags. Then ask:
+*"Audit all flagged modules, or a subset?"*
+
+Do NOT begin Phase 2 until the user names the set. Phases 2-3 are the expensive part; the
+census is cheap and is what tells the user which modules are worth the cost. On a codebase
+with only a handful of modules this degrades to a one-line confirmation.
+
 ## Phase 2: Progressive Disclosure Audit
 
 ### 2.1 Navigation Levels
@@ -160,14 +173,15 @@ The multipliers reflect that decisions and file-hopping are disproportionately e
 | 20-30 | 🟠 High — needs simplification |
 | > 30 | 🔴 Overwhelming — restructure |
 
-### 3.2 Cross-Module Cognitive Load
+### 3.2 Implicit Ordering Dependencies
 
-For a typical user task (e.g., "add a new strategy", "run an analysis"):
+Does using a module correctly require knowing an order the types do not enforce — must call
+A before B, must set X before reading Y? That is knowledge the interface fails to carry, so
+it is a read cost and belongs here.
 
-- How many modules must the user touch?
-- How many files must they read?
-- How many interfaces must they understand?
-- Are there implicit ordering dependencies? (must call A before B, not enforced by types)
+Do NOT count how many files a user must touch to add a feature. That is a *change* cost and
+belongs to `review-architecture`'s Extensibility dimension (`AR-EXT`), which measures exactly
+that with the same worked example. Counting it here produced one finding under two IDs.
 
 ## Phase 4: Findings
 
@@ -257,5 +271,7 @@ FORBIDDEN inside Handoff:
 - Location: path/to/module/ or path/to/file.py
 
 ### Downstream Consumers
-- refactoring-plan (reads Handoff, merges with code-review and review-architecture findings)
-- architect (reads Handoff in W3 Redesign to inform module restructuring)
+- refactoring-plan (reads Handoff; `DM-*` merges with code-review and review-architecture findings)
+- **architect** — NOT a consumer. `architect`'s Consumes enumerates exactly three entry points
+  — ideate, review-architecture, and direct — and `review-depth` is not among them. Reach
+  decomposition work via refactoring-plan, or supply the findings as direct-entry context.

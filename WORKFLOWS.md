@@ -46,7 +46,7 @@ Does code exist?
 **When:** User says the code is broken, slow, flaky, confusing, or "needs work" but
 hasn't diagnosed whether it's a structural problem, a code quality problem, or both.
 
-**Skill chain:** `review-architecture + code-review → findings → user chooses next workflow`
+**Skill chain:** `review-architecture + code-review [+ review-depth] → findings → user chooses next workflow`
 
 **Steps:**
 
@@ -126,7 +126,12 @@ claude "verify the plan"
 
 **Indicators:** Architecture review scorecard mostly 🟢/🟡 with a few 🟠. You're not questioning *what* the pieces are, just *how* they're arranged.
 
-**Skill chain:** `review-architecture → code-review → refactoring-plan → plan-tracker → refactor → plan-tracker (verify)`
+**Skill chain:** `review-architecture → code-review → [review-depth] → refactoring-plan → plan-tracker → refactor → plan-tracker (verify)`
+
+`review-depth` is optional and additive: run it when the complaint is "hard to navigate" or
+"too complex to follow" rather than "wrongly structured". It measures what the code costs to
+UNDERSTAND; review-architecture measures what it costs to CHANGE. Its `DM-*` findings merge
+into refactoring-plan alongside `AR-*` and `CR-*`.
 
 ```bash
 cd ~/Gitrepos/existing-project
@@ -395,6 +400,8 @@ done
 | "The structure is fundamentally wrong" | W3 Redesign | `claude "review the architecture..."` |
 | "I want to add a new feature" | W4 Extend | `claude "review the architecture..."` then `claude "architect where [X] fits..."` |
 | "I have a vague idea" | W5 Explore | `claude "ideate..."` |
+| "I have a design doc but it's vague" | W5 Explore (entry) | `claude "interview me about docs/my-design.md"` → spec-interview → architect |
+| "Do my skills / rules / instruction files conflict?" | W0 Triage (instruction layer) | `claude "audit compatibility across */SKILL.md"` |
 | "This is beyond saving" | W6 Rewrite | `claude "review the architecture..."` (lessons learned) then W1 |
 
 ---
@@ -414,3 +421,6 @@ Workflows aren't always linear. Common mid-workflow transitions:
 | W5 Explore | The problem maps to an existing repo | W4 Extend or W3 Redesign |
 | W5 Explore | The problem is genuinely new | W1 Build |
 | Any | Review scorecard is worse than expected | Step back, re-evaluate scope |
+| W5 Explore | The doc exists but is too ambiguous to architect from | spec-interview first, then architect |
+| Any | A skill fires at the wrong time, two fire at once, or none fires | compat-audit on the colliding sources |
+| Any | A new skill was added to the repo | compat-audit the new skill against its siblings, then `registry_check --check` |

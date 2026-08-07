@@ -34,14 +34,19 @@ lifecycle — from ideation through implementation to ongoing maintenance.
 | Skill | Trigger | Output | Feeds Into |
 |---|---|---|---|
 | **ideate** | "what are my options", "poke holes" | Decision summary with chosen approach | architect |
+| **spec-interview** | hands over a markdown doc: "what's missing", "tighten this spec" | `<stem>.refined.md` + Handoff | architect |
 | **architect** | "what should the components be" | Domain model, module decomposition, abstraction decisions | design |
 | **design** | "build this", multi-file work | Dependency graph, data flow, interfaces, file structure | scaffold, refactor |
 | **scaffold** | "new module", "add another X like Y" | Boilerplate files following conventions | — |
 | **refactor** | "clean this up", "make it proper" | Restructured code with tests passing | — |
-| **code-review** *(existing)* | "review this code" | Severity-ranked findings with BEFORE/AFTER | refactoring-plan |
-| **review-architecture** | "review the architecture" | Scored diagnostic across 7 dimensions | refactoring-plan |
+| **code-review** *(existing)* | "review this code" | Severity-ranked `CR-*` findings with BEFORE/AFTER | refactoring-plan |
+| **review-architecture** | "review the architecture" | Scored diagnostic across 7 dimensions, `AR-*` findings | refactoring-plan |
+| **review-depth** | "too complex", "hard to navigate", "deep modules" | Depth scorecard, `DM-*` findings | refactoring-plan |
+| **compat-audit** | "do these skills conflict", "can I load these together" | Verdict matrix, `CA-*` findings, registry defects | refactoring-plan |
 | **refactoring-plan** | "what should I fix first" | Prioritised, dependency-ordered roadmap | plan-tracker, refactor |
 | **plan-tracker** | multi-step work starts, "create a plan", "verify the plan" | Tracked plan file (`PLAN-*.md`) with status, verification report | refactor, scaffold |
+| **navigator** | "where is X", "what calls Y", "explore the codebase" | Answers about existing code — Q&A, no artifact | — |
+| **orch** | "run this in parallel", "use the conductor" | Dispatch decision; parallel worktree build, test-gated | — |
 
 ## Installation
 
@@ -62,11 +67,23 @@ Place `shared-principles.md` as a sibling to the skill directories.
 │   └── SKILL.md
 ├── refactor/
 │   └── SKILL.md
+├── spec-interview/
+│   └── SKILL.md
 ├── review-architecture/
 │   └── SKILL.md
+├── review-depth/
+│   ├── SKILL.md
+│   └── references/
+├── compat-audit/
+│   ├── SKILL.md
+│   └── references/
 ├── refactoring-plan/
 │   └── SKILL.md
 ├── plan-tracker/
+│   └── SKILL.md
+├── navigator/
+│   └── SKILL.md
+├── orch/
 │   └── SKILL.md
 └── code-review/          ← existing skill, unchanged
     └── SKILL.md

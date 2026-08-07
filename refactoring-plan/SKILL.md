@@ -48,9 +48,16 @@ Aggregate findings from all available sources:
 
 ### 1.2 Deduplicate and Normalise
 
-Aggregate findings by Finding ID. Deduplicate across code-review (CR-\*) and
-review-architecture (AR-\*) by matching IDs that reference the same location. Each plan
-step MUST list the Finding IDs it addresses.
+Aggregate findings by Finding ID. Deduplicate across code-review (CR-\*), review-architecture
+(AR-\*), review-depth (DM-\*), and compat-audit (CA-\*) by matching IDs that reference the same
+location. Each plan step MUST list the Finding IDs it addresses.
+
+Two IDs from different skills at the same location are usually ONE problem seen through two
+lenses — merge them into a single step listing both IDs. Do not treat them as separate work.
+Known overlapping pairs: `AR-ABS` / `DM-PASS` (a one-implementation abstraction), and
+`AR-BND` / `DM-LEAK` (a method exposing a mutable internal). `CA-*` findings are registry and
+instruction defects, so they never co-locate with the code-level IDs — keep them in their own
+phase.
 
 Produce a **consolidated findings list** preserving upstream Finding IDs:
 
@@ -293,15 +300,21 @@ When the refactor skill picks up:
 READ-ONLY
 
 ### Consumes
-- MUST: `## Handoff` from code-review (CR-* IDs) AND/OR review-architecture (AR-* IDs)
-- At least one must be present. If neither: STOP with CONTRACT VIOLATION.
+- MUST: at least one upstream `## Handoff` from a review skill:
+  - code-review (`CR-*` IDs)
+  - review-architecture (`AR-*` IDs)
+  - review-depth (`DM-*` IDs)
+  - compat-audit (`CA-*` IDs)
+- At least one must be present. If none: STOP with CONTRACT VIOLATION.
 - Deduplicate by Finding ID, not prose.
+- `CA-*` findings are registry/instruction defects, not source-code defects. Plan them as
+  their own phase — their verification is re-running the audit, not running the test suite.
 
 ### Produces
 MUST emit a `## Handoff` section containing phased steps:
 - Phases: sequential integers. Steps: N.M format.
 - Each step MUST include:
-  - `Finding IDs:` — list of CR-* and/or AR-* IDs
+  - `Finding IDs:` — list of `CR-*`, `AR-*`, `DM-*`, and/or `CA-*` IDs
   - `Scope:` — single-function | single-module | multi-module | cross-cutting
   - `Risk:` — low | medium | high
   - `What changes:` — bullet list

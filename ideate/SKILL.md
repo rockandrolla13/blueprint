@@ -2,13 +2,17 @@
 name: ideate
 description: >
   Explore the solution space and stress-test design thinking before committing to an approach.
-  Use this skill when the user says "ideate", "explore", "brainstorm", "what are my options",
+  Use this skill when the user says "ideate", "explore my options", "brainstorm", "what are my options",
   "how should I approach", "what's the best way to", "stress-test this", "poke holes in this",
   "what am I missing", or describes a problem without jumping to implementation. Also trigger when
   the user has a rough plan and wants it challenged — the primary mode is adversarial review of
   existing thinking, not blank-slate brainstorming. Trigger for both software infrastructure and
   quantitative strategy problems. Do NOT trigger for "build this", "implement", or "write code" —
-  those belong to the design or scaffold skills.
+  those belong to the design or scaffold skills. Do NOT trigger for "explore the codebase",
+  "where is X", "what calls Y" — exploring EXISTING code is the navigator skill; this skill
+  explores SOLUTION APPROACHES and takes no codebase input. Do NOT trigger when the user hands
+  over a markdown file and asks what it is missing — that is spec-interview, which sharpens an
+  existing document rather than choosing between approaches.
 ---
 
 # Ideate Skill

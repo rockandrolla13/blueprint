@@ -141,10 +141,15 @@ Every skill must produce at least the following. Outputs below this threshold sh
 | Skill | Minimum output |
 |---|---|
 | ideate | Decision Summary with chosen approach (1 sentence) + at least 2 load-bearing assumptions |
+| spec-interview | At least 3 resolved questions + revised document path + Handoff with all MUST labels |
 | architect | Module table with at least 3 rows + Mermaid domain model + DAG check result |
 | design | File structure (at least 3 files) + at least 1 Protocol definition + config approach |
 | code-review | Executive Summary + at least 2 findings with Finding IDs + Summary Table |
 | review-architecture | Scorecard with all 7 dimensions scored + at least 3 findings with Finding IDs |
+| review-depth | Depth scorecard + at least 2 findings with `DM-*` Finding IDs |
+| compat-audit | Verdict matrix + at least 1 fully cited pair section with all 3 scores |
+| navigator | Answer citing at least 1 concrete `path:line` location, or an explicit "not found" |
+| orch | Dispatch decision (delegate / refuse) + the reason, and on delegate a file-disjoint task split |
 | refactoring-plan | At least 1 phase with at least 2 steps, each with all MUST fields |
 | scaffold | All files from design Handoff created + at least 1 smoke test file |
 | refactor | At least 1 step executed with verification checklist completed |

@@ -3,12 +3,17 @@ name: design
 description: >
   Structured architecture design phase that produces a dependency graph, data flow, interfaces,
   and a review checkpoint before any code is written. Use this skill when the user says "design",
-  "architect", "structure", "plan the implementation", "how should I build this", or transitions
-  from ideation to commitment — e.g., "ok let's go with approach X, design it". Also trigger when
-  the user says "build", "implement", or "create" for anything that will span multiple files or
-  modules — the skill enforces a design phase before implementation begins. Do NOT trigger for
-  single-function tasks, bug fixes, or refactoring (those have their own skills). Do NOT trigger
-  for open-ended exploration — that belongs to the ideate skill.
+  "structure", "plan the implementation", "how should I build this", or "wire these components
+  together". Also trigger when the user says "build", "implement", or "create" for anything that
+  will span multiple files or modules — the skill enforces a design phase before implementation
+  begins. REQUIRES an architect Handoff (domain model, module table, DAG check) and halts
+  without one. Do NOT trigger on the word "architect" or on "what should the components be",
+  "how should I decompose this", "where do I draw the boundaries" — that is the architect skill,
+  which runs BEFORE this one and whose Handoff this skill consumes. Do NOT trigger on a bare
+  transition from ideation ("ok let's go with approach X, design it") — that routes to architect
+  first; design cannot accept an ideate Handoff. Do NOT trigger for single-function tasks, bug
+  fixes, or refactoring (those have their own skills). Do NOT trigger for open-ended exploration
+  — that belongs to the ideate skill.
 ---
 
 # Design Skill

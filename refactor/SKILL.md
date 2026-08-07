@@ -8,7 +8,14 @@ description: >
   when the user has built something ad-hoc during a session and wants to solidify it before
   moving on — phrases like "ok that works, now make it proper" or "harden this". Do NOT trigger
   for new designs from scratch (use the design skill) or for bug fixes that don't involve
-  structural changes.
+  structural changes. Do NOT trigger for READ-ONLY diagnosis — "is this well-structured",
+  "review this code", "is this too complex", "audit the structure" ask for a report, not a
+  change: use review-architecture (system structure), review-depth (module interfaces), or
+  code-review (individual files). This skill CHANGES CODE. Do NOT trigger for prioritising or
+  sequencing existing findings into a roadmap — that is refactoring-plan, whose Handoff this
+  skill executes. Do NOT trigger for generating NEW files from a pattern — "new module",
+  "add another X like Y", "stub this out" — that is scaffold; this skill only restructures
+  code that already exists.
 ---
 
 # Refactor Skill
@@ -106,6 +113,20 @@ check whether the current structure handles that change gracefully. If not, that
 highest-priority refactoring target.
 
 ## Phase 3: Refactoring Plan
+
+**Run this phase ONLY when no upstream plan exists.**
+
+Check first:
+
+- **A `refactoring-plan` Handoff was supplied** → SKIP this phase entirely. Do not rebuild,
+  reorder, or "improve" the supplied plan. Execute it in dependency order per the Contract.
+  Re-planning approved work silently discards the gate the user already passed.
+- **No upstream Handoff** (standalone invocation — the common case for a small, local
+  clean-up) → build the plan below.
+
+Standalone plans stay proportionate. If the work spans multiple modules or needs risk
+ordering across many findings, stop and route to `refactoring-plan` instead — that skill
+exists for exactly that, and duplicating it here is how the two drift apart.
 
 **STOP before changing any code.** Present the plan:
 
@@ -257,9 +278,19 @@ After completing the refactoring:
 WRITES CODE (after refactoring-plan gate approval)
 
 ### Consumes
-- MUST: `## Handoff` from refactoring-plan containing phased steps
-- Executes in dependency order (respects Depends on / Blocks)
-- Runs each step's Verification checklist after completion
+Two entry points (exactly one per invocation):
+
+1. **From refactoring-plan (the normal path):**
+   - `## Handoff` containing phased steps
+   - Executes in dependency order (respects Depends on / Blocks)
+   - Runs each step's Verification checklist after completion
+   - Phase 3 is SKIPPED — the plan is already approved; do not rebuild it
+
+2. **Standalone (small, local clean-up):**
+   - No upstream Handoff required
+   - Phase 3 builds the plan inline and gates it
+   - If the work spans multiple modules or needs cross-finding risk ordering, STOP and route
+     to refactoring-plan rather than planning it here
 
 ### Produces
 - Modified source files

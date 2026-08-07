@@ -1,6 +1,6 @@
 ---
 name: code-review
-description: "Use when reviewing Python code for correctness, conciseness, and adherence to project conventions. Produces a severity-ranked Markdown report. Triggers: user says 'review this code', 'code review', 'check this for bugs', or asks for feedback on Python source files. Do NOT trigger for paper/manuscript review or general writing feedback."
+description: "Use when reviewing Python code FILE BY FILE for correctness, conciseness, and adherence to project conventions. Produces a severity-ranked Markdown report of CR-* findings. Triggers: user says 'review this code', 'code review', 'check this for bugs', or asks for feedback on Python source files. Do NOT trigger for system-level structure, boundary quality, or dependency direction — that is review-architecture. Do NOT trigger for module interface depth, cognitive load, or information hiding — that is review-depth. Do NOT trigger for conflicts between instruction files, skills, or rule sets — that is compat-audit. Do NOT trigger to CHANGE code — this skill is read-only; execution is refactor. Do NOT trigger for paper/manuscript review or general writing feedback."
 ---
 
 # Code Review Skill
@@ -85,6 +85,15 @@ Before saving the report, verify your output against the contract:
 - [ ] Output meets minimum: ≥ 2 findings with IDs + Summary Table
 
 If any check fails, fix the output before saving.
+
+## Review Checkpoint
+
+**STOP.** Present the review — Executive Summary, findings, Summary Table — in the session
+first. Then ask: *"Save this to `reviews/`?"*
+
+Do NOT write the file until the user approves. This skill declares `Mode: READ-ONLY`; writing
+a versioned file into the repo unasked would make that declaration false. If the user declines,
+the review still stands — it has already been delivered in the session.
 
 ## Constraints
 
