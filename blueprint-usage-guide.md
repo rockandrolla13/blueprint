@@ -467,16 +467,36 @@ These are convenience shortcuts. You can always type the full prompt instead.
 
 | Skill | Mode | What it does |
 |---|---|---|
+| spec-interview | WRITES ONE .md | Interrogates an existing markdown spec, writes a sharpened copy. Needs a file path |
 | ideate | READ-ONLY | Explore solution space, stress-test approaches, close on one |
 | architect | READ-ONLY | Decompose domain into modules with boundaries |
 | design | READ-ONLY | Define interfaces, protocols, file structure |
 | scaffold | WRITES CODE | Generate project files from approved design |
 | code-review | READ-ONLY | Severity-ranked code findings with CR-* IDs |
-| review-architecture | READ-ONLY | 7-dimension architecture scorecard with AR-* IDs |
-| review-depth | READ-ONLY | Deep modules + progressive disclosure with DM-* IDs |
-| refactoring-plan | READ-ONLY | Phased steps from review findings |
+| review-architecture | READ-ONLY | 7-dimension scorecard, AR-* IDs. Cost to CHANGE the code |
+| review-depth | READ-ONLY | Deep modules + progressive disclosure, DM-* IDs. Cost to UNDERSTAND it |
+| compat-audit | READ-ONLY | Do two instruction sources conflict? CA-* IDs. Reads SKILL.md files, never source code |
+| refactoring-plan | READ-ONLY | Phased steps from review findings. Consumes CR-*, AR-*, DM-*, CA-* |
 | refactor | WRITES CODE | Execute plan steps with verification |
 | plan-tracker | CROSS-CUTTING | Track plan progress, verify completion |
+| navigator | READ-ONLY | Interactive Q&A about existing code. No artifact, no Handoff |
+| orch | READ-ONLY (dispatch) | Decide whether to fan a build out to parallel worktrees. Mostly refuses |
+
+### Pressure packs
+
+`principles/<book-slug>.md` — book-derived checklists that load at a skill's gate when
+their `when:` condition holds, adding checks the skill must satisfy before it presents.
+
+One is installed: `working-effectively-with-legacy-code`, applying to `refactor` when the
+module under change has no test reaching it. It adds two things `refactor` never asked —
+whether a seam exists to *observe* or to *replace*, and what condition retires it.
+
+Packs are pressure, not policy. `shared-principles.md` governs; a pack that disagrees says
+so at the gate rather than resolving it silently. Rules are in that file's `## Pressure
+Packs` section. To remove a pack, delete the file.
+
+A pack is admitted only by evidence — pasted into the gate it claims to improve, with the
+artefact compared against a control run. See `docs/pack-draft/PASTE-TEST.md`.
 
 ### Research (standalone — not part of Blueprint chains)
 
@@ -529,3 +549,15 @@ progressive disclosure. review-architecture won't catch this.
 
 **6. Using W6 Rewrite when W2 Refactor would work.**
 Almost always, you're impatient, not honest about needing a rewrite.
+
+**7. Hand-editing SKILL-INDEX.md.**
+It is generated from skill frontmatter. A hand fix turns a derived file back into
+another registry to drift.
+Fix: `python3 tools/registry_check.py --write`. Run `--check` after any skill edit.
+
+**8. Adding a skill without updating the OLDER skill's negative triggers.**
+Every trigger collision found in this repo was one-sided — the new skill deferred to
+the old one, the old one never reciprocated.
+Fix: `registry_check --check` catches this between same-output-kind peers. It cannot
+see skills whose output kind it can't classify, so run `compat-audit` on a genuinely
+new one.

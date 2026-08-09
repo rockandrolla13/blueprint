@@ -35,13 +35,22 @@ Everything else is derivative:
 
 ### The Gap
 
-None of these contracts are written in blueprint itself. They live in implicit
-assumptions — each skill's phases reference output sections from upstream skills
-without enforcing them. This is the #1 fragility: an agent modifying one skill's
-output format can silently break downstream expectations.
+**RESOLVED.** This section recorded that no contract was written in blueprint itself
+and called it the #1 fragility. All 14 skills now carry a `## Contract (BCS-1.0)`
+block declaring Mode, Consumes, Produces, Degrees of Freedom, and Downstream
+Consumers. `tools/registry_check.py --check` fails if any skill loses it.
 
-**Recommendation:** Add a `## Contract` section to each SKILL.md that explicitly
-states required output sections and downstream consumers.
+**The failure mode that replaced it.** A downstream edge is *declared by the sender*
+and *enforced by the receiver*, so a one-sided declaration always looks correct and
+never runs. Three were found in one audit: `review-depth` named `refactoring-plan` as
+its consumer while `refactoring-plan` admitted only `CR-*` and `AR-*` and would have
+halted; `review-depth` claimed `architect`, which enumerates three entry points and
+does not include it; `design`'s description invited direct entry from ideation while
+its contract required an `architect` Handoff.
+
+**Rule:** before adding a name to `### Downstream Consumers`, open that skill's
+`### Consumes` and confirm it accepts what you emit. If it does not, either change the
+receiver or write the edge as explicitly NOT a consumer. `compat-audit` finds these.
 
 ---
 
@@ -134,6 +143,64 @@ must be valid Python. Config must use Pydantic `BaseModel`. Scaffold copies verb
 **Format:** Phase numbering: sequential integers. Step numbering: `N.M` (phase.step).
 Status labels exactly: `PENDING`, `IN PROGRESS`, `DONE`, `FAILED`, `SKIPPED`, `BLOCKED`.
 Scope vocabulary: single-function / single-module / multi-module / cross-cutting.
+
+---
+
+### spec-interview → architect
+
+| Section | Status | Why |
+|---|---|---|
+| `## Handoff` | **MUST** | entry point into the build chain |
+| `Chosen approach:` (1 sentence) | **MUST** | deliberately the same literal label `ideate` emits, so `architect` accepts it via its existing ideate entry point with no contract change |
+| `Load-bearing assumptions:` | **MUST** | each marked `confirmed` or `unverified` |
+| `Refined document:` | **MUST** | absolute path to the sharpened copy |
+| `Open questions:` | **MUST** | or the literal `none` — unanswered questions must never vanish |
+| Module names, protocols, file structure | FORBIDDEN | that is `architect` and `design`; this skill produces prose |
+
+**Not a direct producer for `design` or `scaffold`.** `design` requires an `architect`
+Handoff. Route `spec-interview → architect → design`.
+
+---
+
+### review-depth → refactoring-plan
+
+| Section | Status | Why |
+|---|---|---|
+| `## Handoff` with `DM-*` Finding IDs | **MUST** | `refactoring-plan` admits `DM-*` alongside `CR-*`, `AR-*`, `CA-*` |
+| Module census table | **MUST** | Module / Interface Size / Impl Depth / Depth Ratio / Rating |
+| Depth scorecard | **MUST** | 5 dimensions, 🟢🟡🟠🔴 |
+
+**Deduplication.** `AR-*` and `DM-*` can describe one problem through two lenses —
+`AR-ABS`/`DM-PASS` for a one-implementation abstraction, `AR-BND`/`DM-LEAK` for an
+exposed mutable internal. `refactoring-plan` merges these into one step listing both IDs.
+
+**Not a producer for `architect`.** It claimed to be; `architect` never accepted it.
+
+---
+
+### compat-audit → refactoring-plan
+
+| Section | Status | Why |
+|---|---|---|
+| `## Handoff` with `CA-*` Finding IDs | **MUST** | types: TRIG, CONT, DUP, GAP |
+| Verdict matrix | **MUST** | one verdict per deep-dived pair; `—` for pairs not examined |
+| Verdicts for pairs not deep-dived | FORBIDDEN | an unexamined pair has no verdict |
+
+`CA-*` findings are registry and instruction defects, not code defects. They never
+co-locate with the code-level IDs, so they are planned as their own phase and verified
+by re-running the audit rather than by the test suite.
+
+---
+
+### navigator → nothing
+
+Terminal, in the same sense as `scaffold`. Answers conversationally, emits no artifact
+and no Handoff. Verified against all 13 other skills' `### Consumes` blocks: nothing
+accepts navigator output.
+
+Note the `## Handoff` heading at `navigator/SKILL.md:138` is **not** a BCS-1.0 Handoff —
+it is a session-exit instruction handing the *user* to an action skill. A tool grepping
+for `## Handoff` will wrongly conclude navigator produces one.
 
 ---
 

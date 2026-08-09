@@ -402,6 +402,8 @@ done
 | "I have a vague idea" | W5 Explore | `claude "ideate..."` |
 | "I have a design doc but it's vague" | W5 Explore (entry) | `claude "interview me about docs/my-design.md"` → spec-interview → architect |
 | "Do my skills / rules / instruction files conflict?" | W0 Triage (instruction layer) | `claude "audit compatibility across */SKILL.md"` |
+| "Where is X? What calls Y?" | No workflow — navigator | `claude "where is [X] in this codebase?"` |
+| "This build fans out across many files" | Any, after decomposition | `claude "should this go to orch?"` — orch mostly refuses, which is the point |
 | "This is beyond saving" | W6 Rewrite | `claude "review the architecture..."` (lessons learned) then W1 |
 
 ---
