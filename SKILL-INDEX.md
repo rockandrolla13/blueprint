@@ -7,7 +7,7 @@ Generated from `*/SKILL.md` frontmatter and `## Contract (BCS-1.0)` blocks by `t
 
 **This is not a loader.** Claude Code builds its available-skills list from a plugin/registry cache, not by reading this file. This index is repo documentation and a drift detector for humans and agents reading the repo. `--check` exits non-zero when it goes stale, so it is CI-able.
 
-14 skills, 15 commands on disk.
+14 skills, 16 commands on disk.
 
 ## When to use what
 
@@ -116,7 +116,7 @@ Verbatim from each `description:`. This is what stops two skills firing on the s
 
 ## Commands
 
-`commands/*.md` are slash-command prompts, not skills. 1 of 15 declare YAML frontmatter; for the rest the purpose below is the file's first line, which is all that can be derived mechanically.
+`commands/*.md` are slash-command prompts, not skills. 1 of 16 declare YAML frontmatter; for the rest the purpose below is the file's first line, which is all that can be derived mechanically.
 
 | Command | Frontmatter | Purpose (first line) |
 |---|---|---|
@@ -127,6 +127,7 @@ Verbatim from each `description:`. This is what stops two skills firing on the s
 | `/extend` | no | I want to extend this codebase. |
 | `/fix-pr` | no | Resolve PR review comments thoroughly. |
 | `/full-build` | no | Full architecture-first build with iteration loops. |
+| `/how` | no | Open the blueprint explainer page in a browser. |
 | `/map` | no | Print a quick map of this blueprint installation. |
 | `/navigate` | no | Make this codebase easier to discover and navigate. |
 | `/research-triage` | no | This is a research codebase. |

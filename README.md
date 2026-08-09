@@ -3,6 +3,9 @@
 Composable Claude skills that enforce structural discipline across the full engineering
 lifecycle — from ideation through implementation to ongoing maintenance.
 
+**New here?** Open [`how-it-works.html`](how-it-works.html) — a plain-language explainer
+of the checkpoint gate, the two chains, and all 14 skills. Or run `/how`.
+
 ## Skill Map
 
 ```

@@ -1,0 +1,304 @@
+<title>How blueprint works</title>
+
+<style>
+  :root {
+    --ground:   #f6f7f9;
+    --surface:  #ffffff;
+    --ink:      #14181f;
+    --muted:    #5b6371;
+    --hair:     #dfe3e9;
+    --gate:     #a8640a;
+    --gate-bg:  #fdf3e4;
+    --safe:     #0e6a67;
+    --safe-bg:  #e4f1f0;
+    --writes:   #9e3626;
+    --writes-bg:#fbe9e5;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground:   #0f1219;
+      --surface:  #161a22;
+      --ink:      #e7eaf0;
+      --muted:    #8d96a6;
+      --hair:     #262c38;
+      --gate:     #e3a552;
+      --gate-bg:  #2a2113;
+      --safe:     #4fb2ad;
+      --safe-bg:  #102726;
+      --writes:   #e08975;
+      --writes-bg:#2b1713;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground:   #0f1219;
+    --surface:  #161a22;
+    --ink:      #e7eaf0;
+    --muted:    #8d96a6;
+    --hair:     #262c38;
+    --gate:     #e3a552;
+    --gate-bg:  #2a2113;
+    --safe:     #4fb2ad;
+    --safe-bg:  #102726;
+    --writes:   #e08975;
+    --writes-bg:#2b1713;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 17px;
+    line-height: 1.65;
+    margin: 0;
+    padding: 0 5vw 6rem;
+  }
+
+  .wrap { max-width: 62rem; margin: 0 auto; }
+  .prose { max-width: 34rem; }
+
+  h1, h2, h3, .mono {
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  }
+
+  h1 {
+    font-size: clamp(1.7rem, 4vw, 2.4rem);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+    margin: 0 0 .6rem;
+  }
+
+  h2 {
+    font-size: 1.05rem;
+    letter-spacing: .02em;
+    margin: 0 0 1.1rem;
+    padding-bottom: .5rem;
+    border-bottom: 1px solid var(--hair);
+  }
+
+  h3 { font-size: .95rem; margin: 0 0 .4rem; }
+
+  p { margin: 0 0 1rem; }
+  a { color: var(--gate); }
+
+  .eyebrow {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: .7rem;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 .5rem;
+  }
+
+  header { padding: 4rem 0 2.5rem; }
+  header .lede { font-size: 1.15rem; color: var(--muted); max-width: 34rem; }
+
+  section { padding: 2.75rem 0; border-top: 1px solid var(--hair); }
+  section:first-of-type { border-top: none; }
+
+  .stack { display: flex; flex-direction: column; gap: 1.5rem; }
+
+  /* chains */
+  .chain { display: flex; flex-wrap: wrap; align-items: center; gap: .45rem; margin: .3rem 0 .9rem; }
+  .node {
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+    font-size: .82rem;
+    padding: .32rem .6rem;
+    border-radius: 3px;
+    border: 1px solid var(--hair);
+    background: var(--surface);
+    white-space: nowrap;
+  }
+  .node.ro     { color: var(--safe);   background: var(--safe-bg);   border-color: transparent; }
+  .node.wr     { color: var(--writes); background: var(--writes-bg); border-color: transparent; }
+  .node.opt    { color: var(--muted); border-style: dashed; }
+  .arrow { color: var(--muted); font-size: .8rem; }
+
+  /* legend */
+  .legend { display: flex; flex-wrap: wrap; gap: 1.25rem; margin-top: 1.25rem; }
+  .legend div { display: flex; align-items: center; gap: .5rem; font-size: .85rem; color: var(--muted); }
+  .swatch { width: .8rem; height: .8rem; border-radius: 2px; flex: none; }
+
+  /* gate callout */
+  .gate-box {
+    background: var(--gate-bg);
+    border-left: 3px solid var(--gate);
+    padding: 1.1rem 1.3rem;
+    border-radius: 0 4px 4px 0;
+  }
+  .gate-box p:last-child { margin-bottom: 0; }
+  .gate-word { color: var(--gate); font-weight: 600; }
+
+  /* table */
+  .scroll { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; font-size: .88rem; min-width: 34rem; }
+  th, td { text-align: left; padding: .55rem .7rem; border-bottom: 1px solid var(--hair); vertical-align: top; }
+  th {
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+    font-size: .68rem; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--muted); font-weight: 500;
+  }
+  td.name { font-family: ui-monospace, Menlo, Consolas, monospace; white-space: nowrap; }
+
+  .pill {
+    display: inline-block; font-size: .68rem; padding: .12rem .45rem; border-radius: 10px;
+    font-family: ui-monospace, Menlo, Consolas, monospace; white-space: nowrap;
+  }
+  .pill.ro { color: var(--safe);   background: var(--safe-bg); }
+  .pill.wr { color: var(--writes); background: var(--writes-bg); }
+
+  code {
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+    font-size: .86em;
+    background: var(--surface);
+    border: 1px solid var(--hair);
+    border-radius: 3px;
+    padding: .05rem .3rem;
+  }
+
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 1rem; }
+  .card { background: var(--surface); border: 1px solid var(--hair); border-radius: 4px; padding: 1rem 1.1rem; }
+  .card p { font-size: .9rem; color: var(--muted); margin: 0; }
+  .card h3 { color: var(--ink); }
+
+  footer { padding-top: 2.5rem; border-top: 1px solid var(--hair); color: var(--muted); font-size: .85rem; }
+</style>
+
+<div class="wrap">
+
+<header>
+  <p class="eyebrow">github.com/rockandrolla13/blueprint</p>
+  <h1>How blueprint works</h1>
+  <p class="lede">Fourteen markdown files that change how Claude thinks about your code. No software runs. The whole idea is that Claude has to stop and ask you before it does anything that matters.</p>
+</header>
+
+<section>
+  <h2>The one idea</h2>
+  <div class="prose">
+    <p>Every skill has a <span class="gate-word">gate</span> — a hard stop where Claude presents what it worked out and waits for you.</p>
+    <p>That's the entire point. Everything else exists to make the gate land in a useful place.</p>
+  </div>
+  <div class="gate-box prose" style="margin-top:1.25rem">
+    <p>Without a gate, Claude reads your code, decides on a plan, and starts editing — and you find out what it thought only by reading the diff afterwards.</p>
+    <p>With one, you see the reasoning while it's still cheap to change.</p>
+  </div>
+</section>
+
+<section>
+  <h2>Two chains</h2>
+  <div class="prose">
+    <p>Skills hand work to each other in a fixed order. Each one produces something the next one is contractually required to accept.</p>
+  </div>
+
+  <p class="eyebrow" style="margin-top:1.75rem">Building something new</p>
+  <div class="chain">
+    <span class="node opt">spec-interview</span><span class="arrow">→</span>
+    <span class="node ro">ideate</span><span class="arrow">→</span>
+    <span class="node ro">architect</span><span class="arrow">→</span>
+    <span class="node ro">design</span><span class="arrow">→</span>
+    <span class="node wr">scaffold</span>
+  </div>
+  <div class="prose">
+    <p>Decide the approach, work out the pieces, define the interfaces, then write the files. Only the last step touches your disk.</p>
+  </div>
+
+  <p class="eyebrow" style="margin-top:1.75rem">Fixing something that exists</p>
+  <div class="chain">
+    <span class="node ro">review-architecture</span>
+    <span class="node ro">code-review</span>
+    <span class="node opt">review-depth</span><span class="arrow">→</span>
+    <span class="node ro">refactoring-plan</span><span class="arrow">→</span>
+    <span class="node wr">refactor</span>
+  </div>
+  <div class="prose">
+    <p>Diagnose first, in three different ways. Turn the findings into an ordered plan. Then execute it — and only then does anything change.</p>
+  </div>
+
+  <div class="legend">
+    <div><span class="swatch" style="background:var(--safe-bg);border:1px solid var(--safe)"></span> reads only — cannot change your files</div>
+    <div><span class="swatch" style="background:var(--writes-bg);border:1px solid var(--writes)"></span> writes code</div>
+    <div><span class="swatch" style="background:transparent;border:1px dashed var(--muted)"></span> optional</div>
+  </div>
+</section>
+
+<section>
+  <h2>Why three review skills</h2>
+  <div class="prose">
+    <p>They sound alike and they are not. Each measures a different cost.</p>
+  </div>
+  <div class="cards" style="margin-top:1.25rem">
+    <div class="card">
+      <h3>review-architecture</h3>
+      <p>What it costs to <strong>change</strong> the code. Boundaries, dependency direction, how many files you touch to add a feature.</p>
+    </div>
+    <div class="card">
+      <h3>review-depth</h3>
+      <p>What it costs to <strong>understand</strong> it. Whether modules hide real complexity or are thin wrappers you have to read through.</p>
+    </div>
+    <div class="card">
+      <h3>code-review</h3>
+      <p>Whether the code is <strong>correct</strong>, file by file. Bugs, conventions, clarity.</p>
+    </div>
+  </div>
+  <div class="prose" style="margin-top:1.25rem">
+    <p>All three write findings with ID tags — <code>AR-*</code>, <code>DM-*</code>, <code>CR-*</code> — and <code>refactoring-plan</code> merges them. Two tags pointing at the same line are usually one problem seen twice, so it folds them into a single step.</p>
+  </div>
+</section>
+
+<section>
+  <h2>All fourteen</h2>
+  <div class="scroll">
+    <table>
+      <thead>
+        <tr><th>Skill</th><th>Mode</th><th>What it's for</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="name">spec-interview</td><td><span class="pill wr">writes 1 md</span></td><td>You hand it a design doc. It asks what the doc leaves unsaid, then writes a sharper copy.</td></tr>
+        <tr><td class="name">ideate</td><td><span class="pill ro">read-only</span></td><td>Explores approaches and argues with your plan. Ends with one decision.</td></tr>
+        <tr><td class="name">architect</td><td><span class="pill ro">read-only</span></td><td>Turns a problem into modules with boundaries.</td></tr>
+        <tr><td class="name">design</td><td><span class="pill ro">read-only</span></td><td>Interfaces, dependency graph, file structure.</td></tr>
+        <tr><td class="name">scaffold</td><td><span class="pill wr">writes code</span></td><td>Generates the files from the approved design.</td></tr>
+        <tr><td class="name">code-review</td><td><span class="pill ro">read-only</span></td><td>File-by-file review. <code>CR-*</code> findings.</td></tr>
+        <tr><td class="name">review-architecture</td><td><span class="pill ro">read-only</span></td><td>Scores structure on 7 dimensions. <code>AR-*</code> findings.</td></tr>
+        <tr><td class="name">review-depth</td><td><span class="pill ro">read-only</span></td><td>Scores how readable the modules are. <code>DM-*</code> findings.</td></tr>
+        <tr><td class="name">compat-audit</td><td><span class="pill ro">read-only</span></td><td>Do two skills or rule files conflict? Reads instruction files, never your source. <code>CA-*</code> findings.</td></tr>
+        <tr><td class="name">refactoring-plan</td><td><span class="pill ro">read-only</span></td><td>Turns findings into an ordered plan with risk and verification per step.</td></tr>
+        <tr><td class="name">refactor</td><td><span class="pill wr">writes code</span></td><td>Executes the plan, checking after each step.</td></tr>
+        <tr><td class="name">plan-tracker</td><td><span class="pill ro">tracking</span></td><td>Keeps a plan file updated so you can stop and resume.</td></tr>
+        <tr><td class="name">navigator</td><td><span class="pill ro">read-only</span></td><td>"Where is X? What calls Y?" Answers questions, produces nothing.</td></tr>
+        <tr><td class="name">orch</td><td><span class="pill ro">read-only</span></td><td>Decides whether a build is worth splitting across parallel agents. Usually says no.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <h2>Pressure packs</h2>
+  <div class="prose">
+    <p>A pack is a checklist taken from one engineering book, stored in <code>principles/</code>. It loads at a skill's gate when its condition is true, and adds checks the skill has to satisfy before it presents to you.</p>
+    <p><strong>One is installed.</strong> It comes from <em>Working Effectively with Legacy Code</em> and fires on <code>refactor</code> when the code being changed has no test reaching it.</p>
+    <p>It adds two questions <code>refactor</code> never asked: is this seam here to <em>watch</em> something or to <em>replace</em> something, and what condition later removes it?</p>
+    <p>Packs are pressure, not policy. If a pack disagrees with your shared principles, it has to say so at the gate rather than quietly winning. To remove one, delete the file.</p>
+  </div>
+  <div class="gate-box prose" style="margin-top:1.25rem">
+    <p>A pack only gets in by proving itself. It's pasted into the gate it claims to improve, and the result is compared against the same task run without it. Three of the four candidates never earned a place.</p>
+  </div>
+</section>
+
+<section>
+  <h2>The checker</h2>
+  <div class="prose">
+    <p>Run <code>python3 tools/registry_check.py --check</code> after changing any skill.</p>
+    <p>It rebuilds the index, confirms every skill still has a gate and a contract, and catches the failure this repo kept repeating: adding a new skill without telling the <em>older</em> one it now has a neighbour. Exit 0 means clean.</p>
+  </div>
+</section>
+
+<footer>
+  <p>Four workflows, fourteen skills, one pack. Everything is markdown — you can read and change any of it.</p>
+</footer>
+
+</div>
