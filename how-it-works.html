@@ -237,7 +237,7 @@
     </div>
     <div class="card">
       <h3>review-depth</h3>
-      <p>What it costs to <strong>understand</strong> it. Whether modules hide real complexity or are thin wrappers you have to read through.</p>
+      <p>What it costs to <strong>understand</strong> it. Whether modules hide real complexity or are thin wrappers you read straight through. Looks for 13 specific problems — hidden call ordering, names that describe machinery, comments covering for bad names.</p>
     </div>
     <div class="card">
       <h3>code-review</h3>
@@ -292,8 +292,12 @@
 <section>
   <h2>The checker</h2>
   <div class="prose">
-    <p>Run <code>python3 tools/registry_check.py --check</code> after changing any skill.</p>
-    <p>It rebuilds the index, confirms every skill still has a gate and a contract, and catches the failure this repo kept repeating: adding a new skill without telling the <em>older</em> one it now has a neighbour. Exit 0 means clean.</p>
+    <p>Run <code>python3 tools/registry_check.py --check</code> after changing any skill. Exit 0 means clean.</p>
+    <p>It rebuilds the index, confirms every skill still has a gate and a contract, and catches the mistake this repo kept repeating: adding a skill without telling the <em>older</em> one it now has a neighbour. Every collision ever found here was one-sided like that.</p>
+    <p>To compare two skills fairly it needs to know what each one produces — so every skill <em>states</em> it in its own file. It used to guess from wording, which meant a reworded description could quietly drop a skill out of the check while the tool still said everything was fine. Now a missing statement is a failure, not a free pass.</p>
+  </div>
+  <div class="gate-box prose" style="margin-top:1.25rem">
+    <p>A check that only ever passes is the same as no check. This one was deliberately broken twice — once by deleting a declaration, once by removing a skill's mention of its neighbour — to confirm it catches both before being trusted.</p>
   </div>
 </section>
 
