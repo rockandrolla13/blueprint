@@ -148,6 +148,42 @@ Also read `claim_problems`: entries with `severity: "error"` already appear in `
 entries with `severity: "warn"` do not, and a warned glob or unnormalised path is usually a
 claim that means something other than what was intended.
 
+### B.2b Dissent review — optional, and it costs money
+
+`check` (§B.2) is free and answers a structural question: is the plan acyclic, are the claims
+disjoint, does anything escape the repo. It cannot tell you whether the *decomposition* is
+sensible, and nothing deterministic can.
+
+```
+cd <target repo> && orchestrate conductor review PLAN-<name>.md --json
+```
+
+This asks every eligible agent **except you** for its single strongest objection, in parallel.
+One invocation each — typically three.
+
+**You are excluded on purpose, and you must not override that.** You authored the plan. Asking
+yourself whether your own decomposition is good returns agreement, and agreement here is worth
+nothing. The entire value is codex, gemini or opencode seeing what you missed. `--include-author`
+exists for debugging the feature, not for reviews.
+
+**When it pays.** Roughly: six or more tasks, or a plan whose phases you were unsure about, or
+any plan where a wrong decomposition would waste more than the review costs. On a three-task
+plan the structural check has already caught the failures worth catching — skip it.
+
+**Read the output yourself; orch reaches no conclusion.** It prints each agent's severity
+(`blocker` / `warning` / `none` / `unknown`) and objection, then says so explicitly. A severity
+is one model's opinion, not a verdict. Weigh them:
+
+- **A blocker you find convincing** → revise the plan and re-run `check`. Do not dispatch.
+- **Warnings only** → your call. Say in the gate (§B.3) what was raised and why you are
+  proceeding anyway.
+- **`unknown`** → the agent ignored the reply format. Read its raw text before discounting it;
+  an unparseable objection is not an absent one.
+- **All `none`** → evidence, not proof. They may all have missed the same thing.
+
+Whatever the outcome, report at the gate what was raised. Silently overruling three agents is
+the failure mode this step exists to prevent.
+
 ### B.3 The gate
 
 **STOP.** Before the first dispatch, present:
@@ -158,8 +194,12 @@ claim that means something other than what was intended.
   plainly that the run has **no spend cap**
 - the resolved `test_command`, quoted
 - the integration branch name
-- this warning, verbatim in substance: *"If a task fails, its worktree and its error output
-  are deleted. You will get roughly one line of diagnostics."*
+- whether `conductor.keep_failed` is set. If it is **not**, give this warning verbatim in
+  substance: *"If a task fails, its branch and its error output are discarded. You will get
+  roughly one line of diagnostics. Setting `conductor.keep_failed: true` keeps both."* If it
+  **is** set, say instead where the evidence will land — `.orch/runs/<run_id>/` and
+  `orch/failed/<run_id>/task-<id>`
+- anything the dissent review raised (§B.2b), if it was run — or that it was not run
 
 Then ask: *"Dispatch this phase?"* Do not call `execute_plan` until the user approves.
 
@@ -292,27 +332,34 @@ decide. Do not "fix" it by removing the gate.
 `Files` cells is `ok: true` and has no disjointness guarantee whatsoever — the one invariant
 the whole design rests on. Always populate `Files`; always read `unclaimed` (§B.2).
 
-### D.3 A failed task destroys its own evidence
+### D.3 A failed task keeps its evidence only if you asked for it
 
-Verified on the first real conductor run (`/home/ak/orch/HANDOFF.md`, item 6): a task ran for
-nine minutes, failed its gate, and left one line — `opencode: tests FAILED: 1 skipped, 1 error
-in 0.08s`. The traceback was in the worktree, and `_fail()` removes the worktree and its
-branch. Nothing recovers it.
+Originally a failed task left one line — `opencode: tests FAILED: 1 skipped, 1 error in
+0.08s` — and `_fail()` removed the worktree and its branch, so the traceback was gone.
 
-So: **capture what you need before a task can fail.** Warn the user at the gate (§B.3) that
-failure diagnostics will be about one line. If they need more, check whether a
-`conductor.keep_failed` setting exists in the installed version before dispatching — it was
-the planned fix as of 2026-08-06 and may have landed since. Do not promise a transcript you
-cannot produce.
+**Fixed in orch v1.1.0.** Set `conductor.keep_failed: true` and a failed task writes its full
+gate output to `.orch/runs/<run_id>/failed-<task_id>.log` and archives its branch as
+`orch/failed/<run_id>/task-<id>`. As of v1.1.0 this covers all three failure modes: a failing
+gate, a merge conflict, and a merge rejected by integration verification.
+
+It is **off by default**, so decide before dispatching, not after. One gap remains: a merge
+conflict archives its branch but writes no log, because git runs `merge --abort` before orch
+sees the conflict hunks. The branch is the artifact in that case.
 
 ### D.4 A task can write outside its claim, and the default merges it anyway
 
-`enforce_file_claim` defaults to `warn`: an out-of-claim write is recorded in evidence and
-merged regardless. On the first live run an agent created `.venv` as a symlink into a *sibling
-task's worktree*; `git add -A` committed it, it merged, and it arrived broken in the user's
-repo (`HANDOFF.md`, item 8). Worktrees are sibling directories under a predictable path and
-nothing stops an agent walking across. For a repo where that matters, set
-`enforce_file_claim: fail` before dispatching.
+`enforce_file_claim` defaults to `warn`: an out-of-claim write inside the worktree is recorded
+in evidence and merged regardless. That default is deliberate — an unclaimed write is usually
+the plan author forgetting to list a file, and `fail` would reject good work. For a repo where
+it matters, set `enforce_file_claim: fail` before dispatching.
+
+The worse case is fixed. On the first live run an agent created `.venv` as a symlink into a
+*sibling task's worktree*; `git add -A` committed it, it merged, and it arrived in the user's
+repo pointing into `/tmp`. **Since orch v1.1.0 a committed symlink whose target resolves
+outside the task's own worktree is refused unconditionally**, whatever `enforce_file_claim`
+says — that class is never benign. Worktrees are still sibling directories under a predictable
+path and nothing prevents an agent reading across; isolation remains a correctness boundary,
+not a sandbox (§D.5).
 
 ### D.5 Worktree isolation is not a sandbox
 

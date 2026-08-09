@@ -30,6 +30,9 @@ Score a codebase on two related principles:
    shows *how* to use it. Two levels down shows *how it works*. A new user should
    be productive after reading only level 1.
 
+Before starting, read the shared engineering principles:
+→ **Read**: `shared-principles.md` (sibling to this skill directory)
+
 ## When to Run
 
 - Before extending a codebase (pre-W4) — ensures new modules follow the pattern
