@@ -34,6 +34,8 @@ graph TD
 | **Phase** | Process Step | Numbered section within a skill with specific actions | Skill logic evolves |
 | **GovernanceDoc** | Reference | Meta-rules: CLAUDE.md (invariants), README (overview), WORKFLOWS (chains) | Repo structure changes |
 | **Artifact** | Output | Review reports (`reviews/`), plan files (`PLAN-*.md`) — produced by skills | Each invocation |
+| **PressurePack** | Subordinate Rule Set | Book-derived checklist in `principles/<slug>.md`, loaded at a gate when its `when:` holds. Adds checks; never adds or removes a gate. `shared-principles.md` governs on conflict | Admitted or deleted — never synced |
+| **Registry** | Derived Index | `SKILL-INDEX.md`, generated from frontmatter by `tools/registry_check.py` | Regenerated; never hand-edited |
 
 ### Rate of Change Map
 
@@ -76,11 +78,19 @@ Skills communicate through Markdown artifacts with implicit contracts:
 
 | Category | Skills | Mode |
 |---|---|---|
-| **Diagnostic** (read-only) | `review-architecture`, `code-review` | Produce findings, never modify |
+| **Diagnostic** (read-only) | `review-architecture`, `review-depth`, `code-review`, `compat-audit` | Produce findings, never modify. Each gates before writing its report to `reviews/` |
 | **Planning** (read-only) | `ideate`, `architect`, `refactoring-plan` | Produce decisions/plans, never modify |
 | **Design** (read-only until approved) | `design` | Produces design, writes nothing until checkpoint passes |
+| **Elicitation** (writes one markdown file) | `spec-interview` | Interrogates an existing spec; writes a sharpened copy after approval. Never code |
 | **Execution** (writes code) | `scaffold`, `refactor` | Modify/create files after plan approval |
 | **Cross-cutting** (tracking) | `plan-tracker` | Creates/updates PLAN-*.md during any workflow |
+| **Interactive** (no artifact) | `navigator` | Answers questions about existing code. Writes nothing, produces no Handoff |
+| **Dispatch** (delegates) | `orch` | Decides whether to fan a build out to parallel worktrees. Primary mode is refusal |
+
+The three code diagnostics divide by *cost measured*, not by file size: `review-architecture`
+measures what it costs to CHANGE the code, `review-depth` what it costs to UNDERSTAND it,
+`code-review` file-level correctness. `compat-audit` is the odd one — its subject is
+instruction files, never source code.
 
 ### By Workflow
 
