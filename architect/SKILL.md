@@ -1,5 +1,6 @@
 ---
 name: architect
+output: structure-spec
 description: >
   Decompose a domain problem into the right software abstractions — bounded contexts, modules,
   classes, functions — with well-drawn boundaries that allow independent evolution. Use this skill

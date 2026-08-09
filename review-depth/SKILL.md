@@ -1,5 +1,6 @@
 ---
 name: review-depth
+output: scored-report
 description: >
   Review Python code for deep module design and progressive disclosure. Scores modules
   on interface-to-implementation ratio, cognitive load at each navigation level, and
@@ -200,6 +201,22 @@ TYPE is one of:
 - `INIT` — `__init__.py` problem
 - `PASS` — Pass-through / wrapper adding no value
 - `SIGN` — Missing signposts (docstrings, `__all__`, type hints)
+- `DEFN` — Avoidable exception surface: a constructor permits an invalid state that callers must then guard against, or 2+ call sites repeat the same defensive check
+- `TEMP` — Temporal coupling: required call ordering the types do not enforce; `prepare`/`process`/`finalize` staging; objects valid only after `init`
+- `UPWD` — Complexity pushed upward: mode flags, config knobs, or the same reasoning repeated at 2+ call sites that the owning module could absorb
+- `SPEC` — Special-general conflation: rare-case branches on the common path; one-caller overfitting; speculative abstraction with no second caller
+- `CMNT` — Compensating comment: a comment explaining a confusing name, flow, or decomposition rather than documenting a contract or rationale
+- `NAME` — Mechanism-revealing name: names describing *how* (`process_list_v2`, `do_work`, `handle`) rather than *what*; inconsistent conventions across sibling operations
+
+`SIGN`, `CMNT`, and `NAME` are three codes because they need three different fixes.
+`SIGN` fires when a signpost is **absent**. `CMNT` fires when a comment is **present and
+compensating** — the fix is to repair what it apologises for and delete it. `NAME` fires
+when a name is **present and wrong**. Do not collapse them.
+
+**Boundary against `review-architecture`.** `SPEC` overlaps `AR-ABS` (premature
+abstraction) and `DEFN` overlaps its encapsulation check. Both are retained deliberately.
+When either fires on code `review-architecture` also flagged, `refactoring-plan`
+deduplicates by location into one step carrying both IDs — see its §1.2.
 
 ### 4.2 Output Format
 
@@ -235,6 +252,9 @@ For each 🔴 or 🟠 dimension, provide:
   - "Merge shallow modules" — combine pass-throughs into their targets
   - "Deepen interface" — hide parameters behind sensible defaults
   - "Add disclosure layer" — create a curated `__init__.py` or facade
+  - "Define away the invalid state" — change the constructor or invariant so the guard is unnecessary (`DEFN`)
+  - "Pull complexity downward" — the owning module absorbs the detail instead of exporting it (`UPWD`, `TEMP`)
+  - "Rename to the abstraction" — name what it is, not how it works; delete the comment that compensated (`NAME`, `CMNT`)
   - "Split god module" — extract coherent subsets behind narrower interfaces
   - "Add signposts" — docstrings, `__all__`, type hints
 - **Do NOT provide code changes** — this is a diagnostic skill
@@ -270,7 +290,7 @@ FORBIDDEN inside Handoff:
 
 ### Degrees of Freedom
 - Scorecard uses 🟢🟡🟠🔴
-- Finding types use exact vocabulary: SHAL, LEAK, FLAT, COGN, INIT, PASS, SIGN
+- Finding types use exact vocabulary: SHAL, LEAK, FLAT, COGN, INIT, PASS, SIGN, DEFN, TEMP, UPWD, SPEC, CMNT, NAME
 - Location: path/to/module/ or path/to/file.py
 
 ### Downstream Consumers

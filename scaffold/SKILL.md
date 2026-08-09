@@ -1,5 +1,6 @@
 ---
 name: scaffold
+output: code
 description: >
   Generate boilerplate code from reusable patterns and templates for common project structures.
   Use this skill when the user says "scaffold", "bootstrap", "create a new module", "set up a

@@ -89,6 +89,7 @@ class Skill:
     description: str = ""
     mode: str = ""
     kind: str = ""
+    declared_output: str = ""
     consumes: list[str] = field(default_factory=list)
     feeds: list[str] = field(default_factory=list)
     negatives: list[str] = field(default_factory=list)
@@ -162,7 +163,8 @@ def load_skill(d: Path, known: set[str]) -> Skill:
     sk.has_pregate = bool(re.search(r"^##\s+Pre-Gate Self-Check", text, re.MULTILINE))
 
     sk.mode = _first_line(_section(text, "Mode"))
-    sk.kind = output_kind(sk.mode, sk.description)
+    sk.declared_output = fm.get("output", "").strip()
+    sk.kind = output_kind(sk.declared_output)
     # Upstream/downstream: only names that resolve to real skill dirs on disk.
     consumes_blk = _section(text, "Consumes")
     sk.consumes = sorted(n for n in known if n != sk.dirname and re.search(rf"\b{re.escape(n)}\b", consumes_blk))
@@ -223,6 +225,12 @@ def check_invariants(skills: list[Skill]) -> list[tuple[str, str]]:
             v.append((s.dirname, "no `## Contract (BCS-1.0)` block"))
         if s.lines > MAX_SKILL_LINES:
             v.append((s.dirname, f"{s.lines} lines exceeds {MAX_SKILL_LINES}"))
+        if not s.declared_output:
+            v.append((s.dirname, "frontmatter has no `output:` — cannot be reciprocity-checked. "
+                                 f"Declare one of: {', '.join(sorted(OUTPUT_KINDS))}"))
+        elif not s.kind:
+            v.append((s.dirname, f"`output: {s.declared_output}` is not a known kind. "
+                                 f"Use one of: {', '.join(sorted(OUTPUT_KINDS))}"))
     return v
 
 
@@ -285,20 +293,29 @@ NEG_MARKER_RE = re.compile(r"do\s+not\s+trigger|don't\s+trigger|do\s+not\s+use|n
 # `code` is read off `### Mode`, the rest off `description:`. These are patterns
 # over DELIVERABLES, never over skill names — no skill is named here, so the
 # check cannot be tuned to make a particular pair pass or fail.
-OUTPUT_KINDS: list[tuple[str, re.Pattern[str]]] = [
-    ("code", re.compile(r"WRITES CODE")),
-    ("scored report", re.compile(r"\bscores?\b|\bscored\b|\bscoring\b|severity-ranked", re.I)),
-    ("ordered plan", re.compile(r"\broadmap\b|tracked execution plan", re.I)),
-    ("structure spec", re.compile(r"\bdependency graph\b|\bbounded contexts\b|\babstractions\b", re.I)),
-]
+# Output kind is DECLARED in each skill's frontmatter (`output:`), never inferred.
+#
+# It was previously guessed by matching words like "scores" or "roadmap" in the
+# description. That silently self-disabled: reword a description, drop the keyword,
+# and the skill fell out of the reciprocity check while this tool still printed PASS.
+# Coverage shrank exactly when descriptions were being edited — the moment collisions
+# get introduced. A missing or unknown `output:` is now a violation, not an exemption:
+# the tool fails loudly rather than quietly checking less.
+OUTPUT_KINDS: frozenset[str] = frozenset({
+    "code",            # writes source files            — scaffold, refactor
+    "scored-report",   # findings with IDs and a score  — the review skills
+    "ordered-plan",    # sequenced steps                — refactoring-plan, plan-tracker
+    "structure-spec",  # modules, interfaces, layout    — architect, design
+    "decision",        # a closed choice, no artifact   — ideate, orch
+    "document",        # one markdown file              — spec-interview
+    "none",            # conversational only            — navigator
+})
 
 
-def output_kind(mode: str, description: str) -> str:
-    """Classify what a skill produces. Empty string = unclassifiable, so exempt."""
-    for kind, pat in OUTPUT_KINDS:
-        if pat.search(mode) or (kind != "code" and pat.search(description)):
-            return kind
-    return ""
+def output_kind(declared: str) -> str:
+    """Return the declared output kind, or '' if absent/unknown (which is a violation)."""
+    d = declared.strip().lower()
+    return d if d in OUTPUT_KINDS else ""
 
 
 @dataclass(frozen=True)
@@ -518,9 +535,12 @@ def render(skills: list[Skill], commands: list[Command], violations: list[tuple[
         L.append("None — every negative trigger between same-kind peers is reciprocated.")
     L.append("")
     exempt = sorted(s.dirname for s in skills if s.description and not s.kind)
-    L.append(f"**Exempt** — output kind not classifiable from `### Mode` or `description:`, so "
-             f"never checked in either direction: "
-             f"{', '.join(f'`{e}`' for e in exempt) if exempt else 'none'}.")
+    if exempt:
+        L.append(f"**Not checked** — no valid `output:` in frontmatter, so invisible to the "
+                 f"reciprocity check in either direction. This is a violation, not an exemption: "
+                 f"{', '.join(f'`{e}`' for e in exempt)}.")
+    else:
+        L.append("**Coverage** — every skill declares an `output:` kind; none is skipped.")
     L.append("")
     L.append("### Drift in hand-maintained registries")
     L.append("")
@@ -611,8 +631,10 @@ def main() -> int:
     for (src, ev), group in _group_one_sided(r.one_sided):
         print(f"  {src} → {', '.join(g.target for g in group)}  [both: {group[0].kind}]")
         print(f"      \"{ev}\"")
-    print(f"  exempt, output kind unclassifiable, never checked: "
-          f"{', '.join(r.exempt) if r.exempt else 'none'}")
+    if r.exempt:
+        print(f"  NOT CHECKED — no valid `output:` declared: {', '.join(r.exempt)}")
+    else:
+        print("  every skill declares an output kind; none skipped")
 
     print("")
     print(f"Other-registry drift ({len(r.drift)}) — report only, nothing edited:")

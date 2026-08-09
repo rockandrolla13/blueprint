@@ -151,7 +151,7 @@ Only checked between skills that produce the SAME output kind. Pointing at a ski
 
 None — every negative trigger between same-kind peers is reciprocated.
 
-**Exempt** — output kind not classifiable from `### Mode` or `description:`, so never checked in either direction: `ideate`, `navigator`, `orch`, `spec-interview`.
+**Coverage** — every skill declares an `output:` kind; none is skipped.
 
 ### Drift in hand-maintained registries
 

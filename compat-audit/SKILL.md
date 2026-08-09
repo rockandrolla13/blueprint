@@ -1,5 +1,6 @@
 ---
 name: compat-audit
+output: scored-report
 description: >
   Audit whether two or more instruction sources — SKILL.md files, pressure packs, CLAUDE.md,
   AGENTS.md, .cursor/rules, or any markdown rule set that steers an AI agent — can be loaded

@@ -1,5 +1,6 @@
 ---
 name: plan-tracker
+output: ordered-plan
 description: >
   Create, update, and verify tracked execution plans for multi-step work. Use this skill
   whenever starting any multi-step workflow (refactor, redesign, build, extend). Also use

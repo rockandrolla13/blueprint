@@ -1,5 +1,6 @@
 ---
 name: navigator
+output: none
 description: >
   Interactive Q&A mode for exploring blueprint and any codebase. Use when the user asks
   "where is X?", "what does Y do?", "show me the structure", "how do I find Z?", or

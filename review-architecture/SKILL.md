@@ -1,5 +1,6 @@
 ---
 name: review-architecture
+output: scored-report
 description: >
   Evaluate the architecture and structural decomposition of an existing codebase against
   principled design heuristics — boundary quality, dependency direction, abstraction fitness,

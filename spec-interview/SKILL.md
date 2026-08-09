@@ -1,5 +1,6 @@
 ---
 name: spec-interview
+output: document
 description: >
   Interrogate an EXISTING markdown design doc, spec, RFC, or plan on disk until its
   ambiguities are resolved, then write a sharpened copy of it. REQUIRES a file path as input.

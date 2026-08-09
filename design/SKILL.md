@@ -1,5 +1,6 @@
 ---
 name: design
+output: structure-spec
 description: >
   Structured architecture design phase that produces a dependency graph, data flow, interfaces,
   and a review checkpoint before any code is written. Use this skill when the user says "design",

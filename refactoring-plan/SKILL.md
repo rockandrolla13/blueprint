@@ -1,5 +1,6 @@
 ---
 name: refactoring-plan
+output: ordered-plan
 description: >
   Synthesise findings from code reviews and architecture reviews into a prioritised, dependency-
   ordered refactoring roadmap with effort estimates and risk assessment. Use this skill when the

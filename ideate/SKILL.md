@@ -1,5 +1,6 @@
 ---
 name: ideate
+output: decision
 description: >
   Explore the solution space and stress-test design thinking before committing to an approach.
   Use this skill when the user says "ideate", "explore my options", "brainstorm", "what are my options",

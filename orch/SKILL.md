@@ -1,5 +1,6 @@
 ---
 name: orch
+output: decision
 description: >
   Decide whether a build should be delegated to orch's conductor — parallel agents in isolated
   git worktrees, test-gated before merge — and if so, author and validate the plan. Use this

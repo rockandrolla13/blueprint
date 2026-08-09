@@ -1,5 +1,6 @@
 ---
 name: refactor
+output: code
 description: >
   Restructure existing code to follow Clean Code, DRY, and extensibility principles without
   changing external behaviour. Use this skill when the user says "refactor", "restructure",
